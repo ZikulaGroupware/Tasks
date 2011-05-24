@@ -1,0 +1,178 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Zikula component\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-05-04 01:25+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. ! module url (lower case without spaces and different to displayname)
+#: lib/Tasks/Version.php:18 lib/Tasks/Version.php:21
+#: lib/Tasks/Installer.php:86 templates/search/options.tpl:4
+msgid "Tasks"
+msgstr ""
+
+#: lib/Tasks/Version.php:19
+msgid "A simple to-do list manger"
+msgstr ""
+
+#: lib/Tasks/Version.php:32
+msgid "Tasks Hooks"
+msgstr ""
+
+#: lib/Tasks/Api/Search.php:83
+msgid "Error! Could not load any articles."
+msgstr ""
+
+#: lib/Tasks/Handler/Participants.php:75
+msgid "Participant already added!"
+msgstr ""
+
+#: lib/Tasks/Handler/Participants.php:85
+msgid "There is something to do"
+msgstr ""
+
+#: lib/Tasks/Handler/Modify.php:47
+msgid "Modify Task"
+msgstr ""
+
+#: lib/Tasks/Handler/Modify.php:56
+#, php-format
+msgid "Task with tid %s not found"
+msgstr ""
+
+#: lib/Tasks/Handler/Modify.php:59
+msgid "Create task"
+msgstr ""
+
+#: lib/Tasks/Handler/Modify.php:74 templates/user/viewAll.tpl:34
+msgid "highest"
+msgstr ""
+
+#: lib/Tasks/Handler/Modify.php:76
+msgid "medium"
+msgstr ""
+
+#: lib/Tasks/Handler/Modify.php:78
+msgid "lowest"
+msgstr ""
+
+#: lib/Tasks/Installer.php:87
+msgid "to-do list for Zikula"
+msgstr ""
+
+#: lib/Tasks/Installer.php:98
+msgid "Main"
+msgstr ""
+
+#: lib/Tasks/Installer.php:103
+msgid "Tasks: 'Main' category created."
+msgstr ""
+
+#: templates/plugins/add.tpl:3 templates/plugins/add.tpl:4
+msgid "Add task"
+msgstr ""
+
+#: templates/plugins/edit_button.tpl:3 templates/plugins/edit_button.tpl:4
+msgid "Edit task"
+msgstr ""
+
+#: templates/plugins/edit_button.tpl:9 templates/plugins/edit_button.tpl:10
+msgid "Manage participants"
+msgstr ""
+
+#: templates/plugins/edit.tpl:2
+msgid "Edit"
+msgstr ""
+
+#: templates/plugins/edit.tpl:5 templates/user/participants.tpl:1
+msgid "Participants"
+msgstr ""
+
+#: templates/user/viewAll.tpl:2 templates/user/view.tpl:3
+#: templates/user/participants.tpl:6 templates/user/modify.tpl:2
+msgid "To-do list"
+msgstr ""
+
+#: templates/user/viewAll.tpl:16
+msgid "Undone tasks"
+msgstr ""
+
+#: templates/user/viewAll.tpl:19
+msgid "Completed tasks"
+msgstr ""
+
+#: templates/user/viewAll.tpl:22
+msgid "All tasks"
+msgstr ""
+
+#: templates/user/viewAll.tpl:25
+msgid "Only my tasks"
+msgstr ""
+
+#: templates/user/viewAll.tpl:26
+msgid "Filter"
+msgstr ""
+
+#: templates/user/viewAll.tpl:33 templates/user/modify.tpl:14
+msgid "Title"
+msgstr ""
+
+#: templates/user/viewAll.tpl:34 templates/user/modify.tpl:20
+msgid "Priority"
+msgstr ""
+
+#: templates/user/viewAll.tpl:35 templates/user/modify.tpl:25
+msgid "Progress"
+msgstr ""
+
+#: templates/user/viewAll.tpl:36 templates/user/modify.tpl:30
+msgid "Deadline"
+msgstr ""
+
+#: templates/user/viewAll.tpl:37 templates/user/modify.tpl:38
+msgid "Category"
+msgstr ""
+
+#: templates/user/viewAll.tpl:38
+msgid "Action"
+msgstr ""
+
+#: templates/user/participants.tpl:21
+msgid "Search:"
+msgstr ""
+
+#: templates/user/participants.tpl:31
+msgid "Add participant"
+msgstr ""
+
+#: templates/user/participants.tpl:41
+msgid "Name"
+msgstr ""
+
+#: templates/user/participants.tpl:56
+msgid "No participants found."
+msgstr ""
+
+#: templates/user/modify.tpl:12
+msgid "Task"
+msgstr ""
+
+#: templates/user/modify.tpl:52
+msgid "Save"
+msgstr ""
+
+#: templates/user/modify.tpl:53
+msgid "Cancel"
+msgstr ""

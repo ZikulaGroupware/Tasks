@@ -25,9 +25,13 @@ function smarty_function_edit($params, &$smarty)
 {
     extract($params);
     unset($params);
-    if(!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_EDIT) and $cr_uid != UserUtil::getVar('uid')) {
-            return;
+    if(!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_EDIT) and $owner != UserUtil::getVar('uid')) {
+        return;
     }
     $smarty->assign('tid', $tid);
-    return $smarty->fetch('plugins/edit.tpl');
+    if(!empty($button) and $button == 'true') {
+        return $smarty->fetch('plugins/edit_button.tpl');
+    } else {
+        return $smarty->fetch('plugins/edit.tpl');
+    }
 }

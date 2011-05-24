@@ -1,14 +1,15 @@
 {pagesetvar name='templatetitle' value=$title}
-<h2>{gt text="To-do"} :: {$title}</h2>
-	
-{edit tid=$tid owner=$cr_uid}
+<h2>
+    <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='To-do list'}</a> ::
+    <a href="{modurl modname="Tasks" type='user' func='view' id=$tid}">{$title}</a>
+</h2>
 
-<b>{gt text="Description"}:</b> {$description}<br /><br />
+<br />
+{edit tid=$tid owner=$cr_uid button="true"}
 
-<b>{gt text="Priority"}:</b> {$priority}<br />
-<b>{gt text="Progress"}:</b> {$progress} %<br />
-{if !empty($deadline) and $deadline != '0000-00-00'}
-<b>{gt text="Deadline"}:</b> {$deadline}<br />
-{/if}
+<p>{$description|transform}</p>
 
-<br /><a href="{modurl modname=Tasks type=user func=viewAll }">{gt text="Back to the list"}</a>
+{notifydisplayhooks eventname='tasks.hook.tasks.ui.view' area='modulehook_area.tasks.tasks' subject=$title id=$tid assign='hooks' caller="Tasks"}
+{foreach from=$hooks key='provider_area' item='hook'}
+{$hook}
+{/foreach}

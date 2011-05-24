@@ -1,20 +1,22 @@
-<h2>{$templatetitle}</h2>
+<h2>
+    <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='To-do list'}</a> ::
+    {if !empty($title)}
+    <a href="{modurl modname="Tasks" type='user' func='view' id=$tid}">{$title}</a> ::
+    {/if}
+    {$templatetitle}
+</h2>
+
 
 {form cssClass="z-form"}
 {formvalidationsummary}
 
 <fieldset>
-    <legend>{gt text='Event'}</legend>
+    <legend>{gt text='Task'}</legend>
     <div class="z-formrow">
         {formlabel for="title"  __text='Title'}
         {formtextinput size="40" maxLength="100" id="title"}
     </div>
 
-
-    <div class="z-formrow">
-        {formlabel for="description" __text='Description'}
-        {formtextinput textMode="multiline" id="description"}
-    </div>
 
     <div class="z-formrow">
         {formlabel for="priority" __text='Priority'}
@@ -40,11 +42,17 @@
         </div>
     {/foreach}
 
-    <div class="z-formbuttons z-buttons">
-        {formbutton class="z-bt-ok" commandName="save" __text="Save"}
-        {formbutton class="z-bt-cancel" commandName="cancel" __text="Cancel"}
-    </div>
-
+    
 </fieldset>
+
+
+
+{editor}
+{formtextinput textMode="multiline" rows='4' cols='100' id="description" style="width:98%;height:200px"}
+
+<div class="z-formbuttons z-buttons">
+    {formbutton class="z-bt-ok" commandName="save" __text="Save"}
+    {formbutton class="z-bt-cancel" commandName="cancel" __text="Cancel"}
+</div>
 
 {/form}

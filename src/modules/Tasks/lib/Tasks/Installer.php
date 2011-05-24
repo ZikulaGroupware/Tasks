@@ -12,7 +12,7 @@
 
  
 
-class Tasks_Installer extends Zikula_Installer
+class Tasks_Installer extends Zikula_AbstractInstaller
 {
     /**
     * initialise the template module
@@ -24,6 +24,7 @@ class Tasks_Installer extends Zikula_Installer
         try {
             DoctrineUtil::createTablesFromModels('Tasks');
         } catch (Exception $e) {
+            LogUtil::registerStatus($e->__toString());
             return false;
         }
        
@@ -31,6 +32,8 @@ class Tasks_Installer extends Zikula_Installer
         $this->setVar('enablecategorization', true);
         // insert default category
         $this->createdefaultcategory('/__SYSTEM__/Modules/Tasks');
+
+        HookUtil::registerHookSubscriberBundles($this->version);
 
         
         // Initialisation successful
@@ -61,7 +64,7 @@ class Tasks_Installer extends Zikula_Installer
     {
 
         // drop table
-        DoctrineUtil::dropTable('tasks');
+        //DoctrineUtil::dropTable('tasks');
         // Delete any module variables
         $this->delVars();
 

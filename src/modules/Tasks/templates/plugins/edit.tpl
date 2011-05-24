@@ -1,6 +1,7 @@
-<div class="z-buttons">
-    <a href="{modurl modname='Tasks' type='user' func='modify' tid=$tid}">
-        {img src='edit.gif' modname='core' set='icons/extrasmall' __alt='Edit task' __title='Edit task'}
-        {gt text="Edit task"}
-    </a>
-</div><br />
+<a href="{modurl modname=Tasks type=user func=modify tid=$tid}">
+    {img modname='core' set='icons/extrasmall' src="xedit.png" __alt="Edit" __title="Edit"}
+</a>
+<a href="{modurl modname=Tasks type=user func=participants tid=$tid}">
+    {img modname='core' set='icons/extrasmall' src="group.png" __alt="Participants" __title="Participants"}
+</a>
+

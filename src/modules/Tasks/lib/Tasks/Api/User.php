@@ -11,7 +11,7 @@
  */
 
 
-class Tasks_Api_User extends Zikula_Api 
+class Tasks_Api_User extends Zikula_AbstractApi 
 {
 
     /**
@@ -23,8 +23,14 @@ class Tasks_Api_User extends Zikula_Api
 
     public function getTask($id)
     {
-        $task = Doctrine_Core::getTable('Tasks_Model_Tasks')->find($id);
-        return $task->toArray();
+        $q = Doctrine_Query::create()->from('Tasks_Model_Tasks e');
+        $q->where('tid = ?', array($id));
+        $task = $q->execute();
+        $task = $task->toArray();
+        if(count($task) == 0) {
+            return false;
+        }
+        return $task[0];
     }
 
     /**
@@ -33,22 +39,54 @@ class Tasks_Api_User extends Zikula_Api
     * @return categories data
     */
 
-    public function getTasks($mode = false)
+    public function getTasks($args)
     { 
-        $q = Doctrine_Query::create()
-            ->from('Tasks_Model_Tasks e')
-            ->orderBy('priority desc, deadline asc');
+        extract($args);
+        
+        
+        $q = Doctrine_Query::create()->from('Tasks_Model_Tasks a');
+            
 
-        if($mode) {
+        if(!empty($mode)) {
             if($mode == "undone") {
                 $q->where('progress < 100');
             } else if($mode == "done") {
                 $q->where('progress = 100');
             }
         }
+        if(empty($orderBy)) {
+            $q->orderBy('priority asc, deadline asc');
+        } else {
+            $q->orderBy($orderBy);
+        }
+            
+        if(!empty($limit)) {
+            $q->limit($limit);
+        }
+        if(!empty($search)) {
+            $search = '%'.$search.'%';
+            $q->addWhere('title like ? or description like ?', array($search,$search));
+        }
+        
+                
+        if(!empty($onlyMyTasks) and $onlyMyTasks == 'on') {
+            $q->leftJoin('a.Tasks_Model_Participants b');
+            $q->addWhere('b.uname = ?', array(UserUtil::getVar('uname')));
+        }
+        
 
         $tasks = $q->execute();
         return $tasks->toArray();
+    }
+    
+    
+    public function getParticipants($tid)
+    {
+        $q = Doctrine_Query::create()
+            ->from('Tasks_Model_Participants e')
+            ->where('tid = ?', array($tid));
+        $participants = $q->execute();
+        return $participants->toArray();
     }
 
 }
