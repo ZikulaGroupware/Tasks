@@ -47,7 +47,7 @@
                 <a href="{modurl modname="Tasks" type='user' func="view" id=$task.tid}">
                 {$task.title}
             </p>
-            <div id="other{$task.tid}_content" style="display:none;">{$task.description|transform}</div>
+            <div id="other{$task.tid}_content" style="display:none;">{$task.description|notifyfilters:'tasks.filter_hooks.description.filter'}</div>
 
         </td>
         <td>{$task.priority}</td>

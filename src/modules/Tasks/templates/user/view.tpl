@@ -7,7 +7,7 @@
 <br />
 {edit tid=$tid owner=$cr_uid button="true"}
 
-<p>{$description|transform}</p>
+<p>{$description|notifyfilters:'tasks.filter_hooks.description.filter'}</p>
 
 {notifydisplayhooks eventname='tasks.hook.tasks.ui.view' area='modulehook_area.tasks.tasks' subject=$title id=$tid assign='hooks' caller="Tasks"}
 {foreach from=$hooks key='provider_area' item='hook'}

@@ -33,7 +33,8 @@ class Tasks_Installer extends Zikula_AbstractInstaller
         // insert default category
         $this->createdefaultcategory('/__SYSTEM__/Modules/Tasks');
 
-        HookUtil::registerHookSubscriberBundles($this->version);
+        HookUtil::registerSubscriberBundles($this->version->getHookSubscriberBundles());
+
 
         
         // Initialisation successful
@@ -62,9 +63,10 @@ class Tasks_Installer extends Zikula_AbstractInstaller
     */
     public function uninstall()
     {
+        HookUtil::unregisterSubscriberBundles($this->version->getHookSubscriberBundles());
 
         // drop table
-        //DoctrineUtil::dropTable('tasks');
+        DoctrineUtil::dropTable('tasks');
         // Delete any module variables
         $this->delVars();
 

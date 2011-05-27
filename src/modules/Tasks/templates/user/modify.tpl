@@ -46,8 +46,7 @@
 </fieldset>
 
 
-
-{editor}
+{notifydisplayhooks eventname='tasks.ui_hooks.editor.display_view' id='description'}	
 {formtextinput textMode="multiline" rows='4' cols='100' id="description" style="width:98%;height:200px"}
 
 <div class="z-formbuttons z-buttons">
