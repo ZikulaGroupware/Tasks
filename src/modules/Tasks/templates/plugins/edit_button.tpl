@@ -10,6 +10,4 @@
         {gt text="Manage participants"}
     </a>
 </div>
-
-
 <br />

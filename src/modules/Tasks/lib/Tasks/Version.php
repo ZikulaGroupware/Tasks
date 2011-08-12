@@ -15,10 +15,10 @@ class Tasks_Version extends Zikula_AbstractVersion
     public function getMetaData()
     {
         $meta = array();
-        $meta['displayname']    = __('Tasks');
-        $meta['description']    = __('A simple to-do list manger');
+        $meta['displayname']    = $this->__('Tasks');
+        $meta['description']    = $this->__('A simple to-do list manger');
         //! module url (lower case without spaces and different to displayname)
-        $meta['url']            = __('Tasks');
+        $meta['url']            = $this->__('Tasks');
         $meta['version']        = '2.0.0';
         $meta['author']         = 'Fabian Wuertz';
         $meta['contact']        = 'http://fabian.wuertz.org';

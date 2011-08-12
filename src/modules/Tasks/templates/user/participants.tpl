@@ -10,15 +10,14 @@
 
 
 {insert name='getstatusmsg'}
-<br />
 
 {form cssClass="z-form"}
 {formvalidationsummary}
 
 <fieldset>
-
+    <legend>{gt text="Search for participants"}</legend>
     <div class="z-formrow" id="liveusersearch">
-        {formlabel for="uname" __text="Search:"}
+        {formlabel for="uname" __text="Search"}
         {formtextinput maxLength="25" id="uname"}
         {img id="ajax_indicator" style="display: none;" modname=core set="ajax" src="indicator_circle.gif" alt=""}
         <div id="username_choices" class="autocomplete_user"></div>
@@ -26,11 +25,9 @@
             liveusersearch();
         </script>
     </div>
-
     <div class="z-formbuttons z-buttons">
         {formbutton class="z-bt-ok" commandName="save" __text="Add participant"}
     </div>
-
 </fieldset>
 
 {/form}
@@ -39,7 +36,7 @@
     <thead>
         <tr>
             <th>{gt text='Name'}</th>
-            <th width="16px"></th>
+            <th class="z-w05">&nbsp;</th>
         </tr>
     </thead>
     <tbody>
@@ -49,11 +46,10 @@
             <td>
                 {assign var='tid'   value=$participant.tid}
                 {assign var='uname' value=$participant.uname}
-                {remove function='removeParticipant' id="$tid,$uname"}
             </td>
         </tr>
         {foreachelse}
-        <tr class="z-admintableempty"><td colspan="3">{gt text='No participants found.'}</td></tr>
+        <tr class="z-admintableempty"><td colspan="2">{gt text='No participants found.'}</td></tr>
         {/foreach}
     </tbody>
 </table>
