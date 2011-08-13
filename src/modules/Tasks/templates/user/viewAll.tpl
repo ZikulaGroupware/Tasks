@@ -63,6 +63,7 @@
             </td>
             <td class="z-nowrap z-right">
                 {edit tid=$task.tid owner=$task.cr_uid}
+                {remove id=$task.tid}
             </td>
         </tr>
         {foreachelse}
