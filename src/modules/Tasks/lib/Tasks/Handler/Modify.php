@@ -29,16 +29,7 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
     {
         if ((!UserUtil::isLoggedIn()) || (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_EDIT))) {
             return LogUtil::registerPermissionError();
-        }
-        
-        // load and assign registred categories
-        $registryCategories  = CategoryRegistryUtil::getRegisteredModuleCategories('Tasks', 'Tasks');
-        $categories = array();
-        foreach ($registryCategories as $property => $cid) {
-            $categories[$property] = (int)$cid;
-        }
-        $view->assign('registries', $categories);
- 
+        }       
 
         
         $tid = FormUtil::getPassedValue('tid', null, "GET", FILTER_SANITIZE_NUMBER_INT);
@@ -51,6 +42,10 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
             if ($task) {
                 $this->_tid = $tid;
                 $this->_progress = (int)$task['progress'];
+                $task['participants2'] = $task['participants']; 
+                $task['participants'] = implode(',', $task['participants']);
+                $task['categories2'] = $task['categories']; 
+                $task['categories'] = implode(',', $task['categories']);
                 $view->assign($task);
             } else {
                 return LogUtil::registerError($this->__f('Task with tid %s not found', $tid));
@@ -59,9 +54,8 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
             $view->assign('templatetitle', $this->__('Create task'));
             $this->_progress = 0;
         }
-        $this->view->assign('today', date('Y-m-d H:i:s') );
-        
-        
+        $this->view->assign('dateformat', __('%Y-%m-%d') );
+                
 
         $percentages = array();
         foreach(range(0, 100, 10) as $i) {
@@ -109,28 +103,75 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         if (!$view->isValid()) {
             return false;
         }
+        
+
 
         // load form values
         $data = $view->getValues();
         
-                
+        
+        
         // switch between edit and create mode        
-        if ($this->_tid) {        
-            $task = Doctrine_Core::getTable('Tasks_Model_Tasks')->find($this->_tid);
+        if ($this->_tid) {
+            $task = $this->entityManager->find('Tasks_Entity_Tasks', $this->_tid);
+            
+            // remove old participants
+            $old_participants = $this->entityManager->getRepository('Tasks_Entity_Participants')
+                                                    ->findBy(array('entity' => $this->_tid));
+            foreach($old_participants as $old_participant) {
+                $this->entityManager->remove($old_participant);
+                $this->entityManager->flush();
+            }
+            // remove old categories
+            $old_categories = $this->entityManager->getRepository('Tasks_Entity_CategoryMembership')
+                                                  ->findBy(array('entity' => $this->_tid));
+            foreach($old_categories as $old_category) {
+                $this->entityManager->remove($old_category);
+                $this->entityManager->flush();
+            }
+
         } else {
             $data['cr_uid'] = UserUtil::getVar('uid');
-            $data['cr_date'] = date('Y-m-d');
-            $task = new Tasks_Model_Tasks();
-
+            $data['cr_date'] = new DateTime;
+            $task = new Tasks_Entity_Tasks();
         }
         
         if((int)$data['progress'] == 100 and $this->_progress != 100) {
-            $data['done_date'] = date('Y-m-d');
+            $data['done_date'] = new DateTime;;
         }
         
+
+        if(!empty($data['participants'])) {
+            $particants = explode(',', $data['participants']);
+            foreach($particants as $participant) {
+                $task->setParticipants($participant);
+            }
+        }
+        unset($data['participants']);
+        
+        
+        if(!empty($data['categories'])) {
+            $categories = explode(',', $data['categories']);
+            foreach($categories as $category) {
+                $em = ServiceUtil::getService('doctrine.entitymanager');
+                $qb = $em->createQueryBuilder();
+                $qb->select('c')
+                   ->from('Tasks_Entity_Categories', 'c')
+                   ->where('c.name = :name')
+                   ->setParameter('name', $category);
+                $query = $qb->getQuery();
+                $result = $query->getArrayResult();
+                $task->setCategories($result[0]['id']);
+            }
+        }
+        unset($data['categories']);
+        
+        
+        $data['deadline'] = new DateTime($data['deadline']);
         
         $task->merge($data);
-        $task->save();
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
 
         return $this->view->redirect($url);
     }

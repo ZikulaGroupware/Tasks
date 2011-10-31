@@ -21,16 +21,42 @@ class Tasks_Api_User extends Zikula_AbstractApi
     * @return category data
     */
 
-    public function getTask($id)
+    public function getTask($tid)
     {
-        $q = Doctrine_Query::create()->from('Tasks_Model_Tasks e');
-        $q->where('tid = ?', array($id));
-        $task = $q->execute();
-        $task = $task->toArray();
-        if(count($task) == 0) {
+        $em = $this->getService('doctrine.entitymanager');
+        $qb = $em->createQueryBuilder();
+        $qb->select('t, p, c')
+           ->from('Tasks_Entity_Tasks', 't')
+           ->where('t.tid = :tid')
+           ->setParameter('tid', $tid)
+           ->leftJoin('t.participants', 'p')
+           ->leftJoin('t.categories', 'c');
+         //  ->leftJoin('c.name', 'n');
+        $query = $qb->getQuery();
+        $result = $query->getArrayResult();
+        if(count($result) == 0) {
             return false;
         }
-        return $task[0];
+        
+        $task = $result[0];
+        
+        
+        
+        $all_categories = $this->getCategories('list');
+        $categories = array();
+        foreach($task['categories'] as $value) {
+            $id  = $value['categoryId'];
+            $categories[$id] = $all_categories[$id];
+        }
+        $task['categories']  = $categories;
+        
+        $participants = array();
+        foreach($task['participants'] as $value) {
+            $participants[] = $value['uname'];
+        }
+        $task['participants'] = $participants;      
+        
+        return $task;
     }
 
     /**
@@ -44,49 +70,225 @@ class Tasks_Api_User extends Zikula_AbstractApi
         extract($args);
         
         
-        $q = Doctrine_Query::create()->from('Tasks_Model_Tasks a');
-            
+        $em = $this->getService('doctrine.entitymanager');
+        $qb = $em->createQueryBuilder();
+        $qb->select('t, p, c')
+           ->from('Tasks_Entity_Tasks', 't')
+           ->leftJoin('t.categories', 'c')
+           ->leftJoin('t.participants', 'p');
 
-        if(!empty($mode)) {
+       if(!empty($mode)) {
+            if( is_array($mode) ) {
+                $mode = $mode['0'];
+            }
             if($mode == "undone") {
-                $q->where('progress < 100');
+                $qb->where('t.progress < 100');
             } else if($mode == "done") {
-                $q->where('progress = 100');
+                $qb->where('t.progress = 100');
             }
         }
+        
+        
         if(empty($orderBy)) {
-            $q->orderBy('priority asc, deadline asc');
+            $qb->orderBy('t.priority', 'ASC');
+            $qb->addOrderBy('t.deadline', 'ASC');
         } else {
-            $q->orderBy($orderBy);
+            list($order, $sort) = explode(' ', $orderBy);
+            $qb->orderBy('t.'.$order, $sort);
+        }
+        
+        
+        if(!empty($category) and $category[0] != 'all' and $category != 'all') {
+           $qb->leftJoin('t.categories', 'cc')
+              ->andWhere('cc.categoryId = :categoryId')
+              ->setParameter('categoryId', $category);
         }
             
-        if(!empty($limit)) {
-            $q->limit($limit);
-        }
-        if(!empty($search)) {
+
+       if(!empty($search)) {
             $search = '%'.$search.'%';
-            $q->addWhere('title like ? or description like ?', array($search,$search));
+            $qb->andWhere('t.title like ? or t.description like ?', array($search,$search));
         }
+        
         
                 
-        if(!empty($onlyMyTasks) and $onlyMyTasks == 'on') {
-            $q->leftJoin('a.Tasks_Model_Participants b');
-            $q->addWhere('b.uname = ?', array(UserUtil::getVar('uname')));
+        if(empty($paginator) and !empty($limit)) {
+            if( is_array($limit) ) {
+                $limit = $limit['0'];
+            }
+            $qb->setMaxResults($limit);
+        }
+                
+        if(!empty($onlyMyTasks) and $onlyMyTasks !== false) {
+           $qb->leftJoin('t.participants', 'pp')
+              ->andWhere('pp.uname = :uname')
+              ->setParameter('uname', UserUtil::getVar('uname'));
         }
         
+        $query = $qb->getQuery();  
+        
+        if( !empty($paginator) and !empty($limit) and !empty($startnum) ) {
+            $count = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);
+            $paginateQuery = \DoctrineExtensions\Paginate\Paginate::getPaginateQuery($query, $startnum, $limit); // Step 2 and 3
+            $result = $paginateQuery->getArrayResult();
+        } else {
+            $result = $query->getArrayResult();
+        }
 
-        $tasks = $q->execute();
-        return $tasks->toArray();
+        
+                
+        // format categories
+        $all_categories = $this->getCategories('list');
+        foreach ($result as $key => $tasks) {
+            $list = array();
+            foreach($tasks['categories'] as $category) {
+                $id = $category['categoryId'];
+                $list[$id] = $all_categories[$id];
+            }
+            $result[$key]['categories'] = $list;
+        }
+        
+        
+        if(!empty($paginator)) {
+            return array($result, $count);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Get all tasks categories
+     *
+     * @param string output style (list|formdropdownlist)
+     * @return array query array | formdropdownlist array
+     */    
+    public function getCategories($output = 'list')
+    {        
+        $em = $this->getService('doctrine.entitymanager');
+        $qb = $em->createQueryBuilder();
+        $qb->select('c')
+           ->from('Tasks_Entity_Categories', 'c')
+           ->orderBy('c.name');
+        $query= $qb->getQuery();
+        $categories = $query->getArrayResult();  
+        
+        
+        if($output == 'formdropdownlist') {
+            $formdropdownlist[] = array(
+                'text'  => $this->__('All'),
+                'value' => 'all'
+            );
+            foreach($categories as $category) {
+                $formdropdownlist[] = array(
+                    'text'  => $category['name'],
+                    'value' => $category['id']
+                );
+            }
+            return $formdropdownlist;
+        } else if( $output  == 'list') {
+            $list['all'] = $this->__('All');
+            foreach($categories as $category) {
+                $list[$category['id']] = $category['name'];
+            }
+            return $list;
+        } else {   
+            return $categories;
+        }
+        
+        
+        
     }
     
     
-    public function getParticipants($tid)
+    /**
+     * Get all tasks modes (done,undone and all)
+     *
+     * @return array formdropdownlist array
+     */
+    public function getModes()
     {
-        $q = Doctrine_Query::create()
-            ->from('Tasks_Model_Participants e')
-            ->where('tid = ?', array($tid));
-        $participants = $q->execute();
-        return $participants->toArray();
+        return array(
+            'undone' => $this->__('Undone tasks'),
+            'done'   => $this->__('Completed tasks'),
+            'all'    => $this->__('All tasks')
+        );
     }
+    
+    
+    /**
+     * Get items per page array
+     *
+     * @return array formdropdownlist array
+     */
+    public function getItemsPerPage()
+    {
+        $result = array();
+        foreach(array( 1, 5, 10, 20, 50, 100) as $value) {
+            $result[$value] = $value;
+        }
+        return $result;
+    }
+    
+    
+    public function isAllowedToEdit($args)
+    {
+        extract($args);
+        unset($args);
+        if(SecurityUtil::checkPermission('Tasks::', '::', ACCESS_EDIT) ) {
+            return true;
+        } else if (isset ($owner) and $owner == UserUtil::getVar('uid')) {
+            return true;
+        } else {
+            return false;
+        }
 
+    }
+    
+
+    /**
+     * Format participants
+     *
+     * @param array
+     * @return string
+     */
+    public function formatParticipants($participants)
+    {    
+        $unames = array();
+        foreach($participants as $participant) {
+            if(is_array($participant)) {
+                $uname = $participant['uname'];
+                $unames[$uname] = $uname;
+            } else {
+                $unames[$participant] = $participant; 
+            }
+        }
+
+        $uname = UserUtil::getVar('uname');
+        $number_of_participants = count($unames);
+        if(array_key_exists($uname, $unames)) {
+            if($number_of_participants == 1 ) {
+                return $this->__('You');
+            } else if( count($unames) == 2 ) {
+                unset($unames[$uname]);
+                return $this->__f('You and %s', array_shift($unames));
+            } else {
+                $number_of_participants = $number_of_participants-1;
+                return $this->__f('You and %s others', $number_of_participants);
+            }
+        } else {
+            if($number_of_participants < 3) {
+                return implode(' '.$this->__('and').' ', $unames);
+            } else {
+                sort($unames);
+                $number_of_participants = $number_of_participants-1;
+                return $this->__f(
+                    '%s and %t others',
+                    array(array_shift($unames), $number_of_participants)
+                );
+            }
+        }
+
+        return implode(',', $unames);
+    }
+    
 }

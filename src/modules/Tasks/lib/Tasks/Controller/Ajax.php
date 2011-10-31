@@ -34,9 +34,10 @@ class Tasks_Controller_Ajax extends Zikula_AbstractController
         if(!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_DELETE) ){
             return;
         }
-        $tid = FormUtil::getPassedValue('id', -1, 'GET');
-        $task = Doctrine_Core::getTable('Tasks_Model_Tasks')->find($tid);
-        $task->delete();
+        $tid = FormUtil::getPassedValue('id', -1, 'GET');        
+        $task = $this->entityManager->find('Tasks_Entity_Tasks', $tid);
+        $this->entityManager->remove($task);
+        $this->entityManager->flush();
     }
     
     public function removeParticipant()
@@ -55,26 +56,102 @@ class Tasks_Controller_Ajax extends Zikula_AbstractController
         $participant->delete();
     }
     
-    public function getUsers()
+    /**
+     * getusers
+     * performs a user search based on the keyword entered so far
+     *
+     * @author Frank Schummertz
+     * @param keyword string the fragment of the username entered
+     * @return void nothing, direct ouptut using echo!
+     */
+    public function getusers()
     {
-        $view = Zikula_View::getInstance($this->name);
+        // Security check
+        if (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_READ)) {
+            AjaxUtil::error($this->__('Sorry! You do not have authorisation for this module.'));
+        }
 
-        $fragment = $this->request->getGet()->get('fragment', $this->request->getPost()->get('fragment'));
+        $keyword = FormUtil::getPassedValue('keyword', '', 'POST');
+        if (empty($keyword)) {
+            AjaxUtil::error($this->__('Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again.'));
+        }
 
-        ModUtil::dbInfoLoad($this->name);
-        $tables = DBUtil::getTables();
+        $pntable     = DBUtil::getTables();
+        $userscolumn = $pntable['users_column'];
 
-        $usersColumn = $tables['users_column'];
+        $where = 'WHERE ' . $userscolumn['uname'] . ' REGEXP \'(' . DataUtil::formatForStore($keyword) . ')\' AND '.$userscolumn['uname'].' NOT LIKE \'Anonymous\'';
+        $orderby = 'ORDER BY ' . $userscolumn['uname'] . ' ASC';
 
-        $where = 'WHERE ' . $usersColumn['uname'] . ' REGEXP \'(' . DataUtil::formatForStore($fragment) . ')\''.
-                 'AND ' . $usersColumn['activated'] .'= 1';
-        $results = DBUtil::selectObjectArray('users', $where);
+        $countusers = DBUtil::selectObjectCount('users', $where);
+        if ($countusers < 11) {
+            $users = DBUtil::selectObjectArray('users', $where, $orderby);
+        } else {
+            return;
+        }
 
-        $view->assign('results', $results);
+        if ($users === false) {
+            return AjaxUtil::registerError ($this->__('Error! Could not load data.'));
+        }
 
-        $output = $view->fetch('ajax/getusers.tpl');
+        $return = array();
+        foreach ($users as $user) {
+            $return[] = array('caption' => $user['uname'],
+                    'value'   => $user['uname']);
+        }
 
-        return new Zikula_Response_Ajax_Plain($output);
+        $output = json_encode($return);
+
+        header('HTTP/1.0 200 OK');
+        echo $output;
+        System::shutdown();
     }
+    
+    
+    /**
+     * getusers
+     * performs a user search based on the keyword entered so far
+     *
+     * @param keyword string the fragment of the username entered
+     * @return void nothing, direct ouptut using echo!
+     */
+    public function getcategories()
+    {
+        // Security check
+        if (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_READ)) {
+            AjaxUtil::error($this->__('Sorry! You do not have authorisation for this module.'));
+        }
+
+        $keyword = FormUtil::getPassedValue('keyword', '', 'POST');
+        if (empty($keyword)) {
+            AjaxUtil::error($this->__('Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again.'));
+        }
+
+        
+        $em = $this->getService('doctrine.entitymanager');
+        $qb = $em->createQueryBuilder();
+        $qb->select('c')
+           ->from('Tasks_Entity_Categories', 'c');
+        $query = $qb->getQuery();
+        $categories = $query->getArrayResult();
+
+        if ($categories === false) {
+            return AjaxUtil::registerError ($this->__('Error! Could not load data.'));
+        }
+
+        $return = array();
+        foreach ($categories as $category) {
+            $return[] = array('caption' => $category['name'],
+                    'value'   => $category['name']);
+        }
+
+        $output = json_encode($return);
+
+        header('HTTP/1.0 200 OK');
+        echo $output;
+        System::shutdown();
+    }
+    
+    
+    
    
 }
