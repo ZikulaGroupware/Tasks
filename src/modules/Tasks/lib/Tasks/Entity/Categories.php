@@ -39,12 +39,28 @@ class Tasks_Entity_Categories extends Zikula_EntityAccess
     private $id;
     
     
+    public function getId()
+    {
+        return $this->id;
+    }
+    
     /**
      * The following are annotations which define the name field.
      *
      * @ORM\Column(type="string")
      */
     private $name;
+    
+    
+    public function getName()
+    {
+        return $this->name;
+    }
+    
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
     
  
     

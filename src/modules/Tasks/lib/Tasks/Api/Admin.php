@@ -22,6 +22,21 @@ class Tasks_Api_Admin extends Zikula_AbstractApi
     public function getlinks($args)
     {
         $links = array();
+        if (SecurityUtil::checkPermission('Tasks::', '::', ACCESS_ADMIN)) {
+            $links[] = array(
+                'url' => ModUtil::url($this->name, 'admin', 'viewCategories'),
+                'text' => __('Categories'),
+                'class' => 'z-icon-es-view'
+            );
+            $links[] = array(
+                'url' => ModUtil::url($this->name, 'admin', 'importCSV'),
+                'text' => __('Import CSV'),
+                'class' => 'z-icon-es-import'
+            );
+        }
         return $links;
     }
+    
+    
+    
 }

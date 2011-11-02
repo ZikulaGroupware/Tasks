@@ -44,6 +44,11 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
         $this->tid = $tid;
     }
     
+    public function getTid()
+    {
+        return $this->tid;
+    }
+    
     /**
      * The following are annotations which define the id field.
      *

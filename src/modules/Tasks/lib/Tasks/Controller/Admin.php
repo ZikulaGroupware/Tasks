@@ -33,5 +33,32 @@ class Tasks_Controller_Admin extends Zikula_AbstractController
         return $this->view->fetch('admin/main.tpl');
     }
     
+    
+   /**
+    * Import a CSV input
+    *
+    * @param array $args POST/REQUEST vars
+    * @return The view var
+    */
+    public function viewCategories($args)
+    {
+        $form = FormUtil::newForm('Tasks', $this);
+        return $form->execute('admin/modifyCategory.tpl', new Tasks_Handler_ModifyCategory());
+    }
+    
+    
+    
+   /**
+    * Import a CSV input
+    *
+    * @param array $args POST/REQUEST vars
+    * @return The view var
+    */
+    public function importCSV($args)
+    {
+        $form = FormUtil::newForm('Tasks', $this);
+        return $form->execute('admin/importCSV.tpl', new Tasks_Handler_ImportCSV());
+    }
+    
      
 }

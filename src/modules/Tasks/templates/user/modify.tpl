@@ -4,14 +4,14 @@
 
 <h2>
     <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='Tasks'}</a> &#187;
-    {if !empty($title)}
-    <a href="{modurl modname="Tasks" type='user' func='view' id=$tid}">{$title}</a> &#187;
-    {/if}
+    <a href="{modurl modname="Tasks" type='user' func='view' tid=$tid}">{$title}</a> &#187;
     {$templatetitle}
 </h2>
 
 <div id="intercom">
 
+
+{insert name='getstatusmsg'}
 
 {form cssClass="z-form z-linear"}
 {formvalidationsummary}
@@ -45,6 +45,7 @@
                 {/if}
             </ul>
         </div>
+        <em class="z-formnote z-sub">{gt text="Available categories"}: {$availableCategories}.</em>
     </div>
 
 
@@ -113,3 +114,4 @@
 
 
 </div>
+

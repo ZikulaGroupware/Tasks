@@ -1,5 +1,5 @@
 {pageaddvar name='javascript' value='javascript/helpers/Zikula.UI.js'}
-<a id="r_{$tid}">
+<a id="r_{$id}">
     {img modname=core set=icons/extrasmall src='14_layer_deletelayer.png' alt='Remove'}
 </a>
 
@@ -10,7 +10,7 @@
 
     deleteIt = function(res) {
         if(res) {
-            var pars = "module=Tasks&func=remove&id={{$tid}}";
+            var pars = "module=Tasks&func={{$function}}&id={{$id}}";
             var myAjax = new Ajax.Request(
                 "ajax.php",
                 {
@@ -20,7 +20,7 @@
                 });
         }
     }
-    $('r_{{$tid}}').observe(
+    $('r_{{$id}}').observe(
         'click',
         Zikula.UI.IfConfirmed(
             'Do you want to remove this entry?',

@@ -83,16 +83,16 @@ class Tasks_Api_User extends Zikula_AbstractApi
             }
             if($mode == "undone") {
                 $qb->where('t.progress < 100');
+                if(empty($orderBy)) {
+                    $qb->orderBy('t.progress', 'DESC');
+                }
             } else if($mode == "done") {
                 $qb->where('t.progress = 100');
             }
         }
         
         
-        if(empty($orderBy)) {
-            $qb->orderBy('t.priority', 'ASC');
-            $qb->addOrderBy('t.deadline', 'ASC');
-        } else {
+        if(!empty($orderBy)) {
             list($order, $sort) = explode(' ', $orderBy);
             $qb->orderBy('t.'.$order, $sort);
         }
@@ -111,6 +111,13 @@ class Tasks_Api_User extends Zikula_AbstractApi
         }
         
         
+        if(!empty($onlyMyTasks) and $onlyMyTasks !== false) {
+           $qb->leftJoin('t.participants', 'q')
+              ->andWhere('q.uname = :uname')
+              ->setParameter('uname', UserUtil::getVar('uname'));
+        }
+        
+        
                 
         if(empty($paginator) and !empty($limit)) {
             if( is_array($limit) ) {
@@ -118,23 +125,16 @@ class Tasks_Api_User extends Zikula_AbstractApi
             }
             $qb->setMaxResults($limit);
         }
-                
-        if(!empty($onlyMyTasks) and $onlyMyTasks !== false) {
-           $qb->leftJoin('t.participants', 'pp')
-              ->andWhere('pp.uname = :uname')
-              ->setParameter('uname', UserUtil::getVar('uname'));
-        }
         
         $query = $qb->getQuery();  
         
-        if( !empty($paginator) and !empty($limit) and !empty($startnum) ) {
+        if( !empty($paginator) and !empty($limit)) {      
             $count = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);
             $paginateQuery = \DoctrineExtensions\Paginate\Paginate::getPaginateQuery($query, $startnum, $limit); // Step 2 and 3
             $result = $paginateQuery->getArrayResult();
         } else {
             $result = $query->getArrayResult();
         }
-
         
                 
         // format categories
@@ -143,15 +143,21 @@ class Tasks_Api_User extends Zikula_AbstractApi
             $list = array();
             foreach($tasks['categories'] as $category) {
                 $id = $category['categoryId'];
-                $list[$id] = $all_categories[$id];
+                if( array_key_exists($id, $all_categories) ) {
+                    $list[$id] = $all_categories[$id];
+                }
             }
             $result[$key]['categories'] = $list;
         }
         
         
-        if(!empty($paginator)) {
+        if(!empty($paginator) ) {
+            if(empty($count)) {
+                $count = 0;
+            }
             return array($result, $count);
         }
+        
         
         return $result;
     }
@@ -159,11 +165,13 @@ class Tasks_Api_User extends Zikula_AbstractApi
     /**
      * Get all tasks categories
      *
-     * @param string output style (list|formdropdownlist)
+     * @param $outputStyle string output style (query|list|select|formdropdownlist)
      * @return array query array | formdropdownlist array
      */    
-    public function getCategories($output = 'list')
+    public function getCategories( $outputStyle = 'query' )
     {        
+        
+                
         $em = $this->getService('doctrine.entitymanager');
         $qb = $em->createQueryBuilder();
         $qb->select('c')
@@ -171,31 +179,36 @@ class Tasks_Api_User extends Zikula_AbstractApi
            ->orderBy('c.name');
         $query= $qb->getQuery();
         $categories = $query->getArrayResult();  
-        
-        
-        if($output == 'formdropdownlist') {
-            $formdropdownlist[] = array(
-                'text'  => $this->__('All'),
-                'value' => 'all'
-            );
-            foreach($categories as $category) {
+                
+        switch ($outputStyle) {
+            case 'query':
+                return $categories;
+            case 'formdropdownlist':
                 $formdropdownlist[] = array(
-                    'text'  => $category['name'],
-                    'value' => $category['id']
+                    'text'  => $this->__('All'),
+                    'value' => 'all'
                 );
-            }
-            return $formdropdownlist;
-        } else if( $output  == 'list') {
-            $list['all'] = $this->__('All');
-            foreach($categories as $category) {
-                $list[$category['id']] = $category['name'];
-            }
-            return $list;
-        } else {   
-            return $categories;
-        }
-        
-        
+                foreach($categories as $category) {
+                    $formdropdownlist[] = array(
+                        'text'  => $category['name'],
+                        'value' => $category['id']
+                    );
+                }
+                return $formdropdownlist;
+            case 'list':
+                foreach($categories as $category) {
+                    $list[$category['id']] = $category['name'];
+                }
+                return $list;
+            case 'select':
+                $select['all'] = $this->__('All');
+                foreach($categories as $category) {
+                    $select[$category['id']] = $category['name'];
+                }
+                return $select;
+            default:
+                return $categories;
+        }        
         
     }
     
@@ -243,52 +256,6 @@ class Tasks_Api_User extends Zikula_AbstractApi
         }
 
     }
-    
-
-    /**
-     * Format participants
-     *
-     * @param array
-     * @return string
-     */
-    public function formatParticipants($participants)
-    {    
-        $unames = array();
-        foreach($participants as $participant) {
-            if(is_array($participant)) {
-                $uname = $participant['uname'];
-                $unames[$uname] = $uname;
-            } else {
-                $unames[$participant] = $participant; 
-            }
-        }
-
-        $uname = UserUtil::getVar('uname');
-        $number_of_participants = count($unames);
-        if(array_key_exists($uname, $unames)) {
-            if($number_of_participants == 1 ) {
-                return $this->__('You');
-            } else if( count($unames) == 2 ) {
-                unset($unames[$uname]);
-                return $this->__f('You and %s', array_shift($unames));
-            } else {
-                $number_of_participants = $number_of_participants-1;
-                return $this->__f('You and %s others', $number_of_participants);
-            }
-        } else {
-            if($number_of_participants < 3) {
-                return implode(' '.$this->__('and').' ', $unames);
-            } else {
-                sort($unames);
-                $number_of_participants = $number_of_participants-1;
-                return $this->__f(
-                    '%s and %t others',
-                    array(array_shift($unames), $number_of_participants)
-                );
-            }
-        }
-
-        return implode(',', $unames);
-    }
+   
     
 }

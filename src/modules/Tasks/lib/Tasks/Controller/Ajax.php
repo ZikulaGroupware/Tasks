@@ -40,6 +40,19 @@ class Tasks_Controller_Ajax extends Zikula_AbstractController
         $this->entityManager->flush();
     }
     
+    
+    public function removeCategory()
+    {
+        if(!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_DELETE) ){
+            return;
+        }
+        $id = FormUtil::getPassedValue('id', -1, 'GET');        
+        $category = $this->entityManager->find('Tasks_Entity_Categories', $id);
+        $this->entityManager->remove($category);
+        $this->entityManager->flush();
+    }
+    
+    
     public function removeParticipant()
     {
         if(!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_DELETE) ){

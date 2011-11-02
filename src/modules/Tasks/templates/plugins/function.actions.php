@@ -27,6 +27,8 @@ function smarty_function_actions($params, &$smarty)
     
     if(ModUtil::apiFunc(ModUtil::getName(), 'user', 'isAllowedToEdit', $params)) {
         $smarty->assign('tid', $tid);
+        $smarty->assign('id',  $tid);
+        $smarty->assign('function',  'remove');
         if( isset($style) and $style == 'button') {
             $output  = $smarty->fetch('plugins/edit_button.tpl');
             $output .= $smarty->fetch('plugins/remove_button.tpl');

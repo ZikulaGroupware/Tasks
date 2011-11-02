@@ -36,11 +36,16 @@ class Tasks_Controller_User extends Zikula_AbstractController
 
     public function viewTasks()
     {
+        // Security check
+        if (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_READ)) {
+            return LogUtil::registerPermissionError();
+        }
+        
         $data['mode']        = FormUtil::getPassedValue('mode');
         $data['onlyMyTasks'] = FormUtil::getPassedValue('onlyMyTasks', false); 
         $data['category']    = FormUtil::getPassedValue('category', 'all');
         $data['limit']       = FormUtil::getPassedValue('limit', 10);
-        $data['startnum']    = FormUtil::getPassedValue('startnum', 1);
+        $data['startnum']    = FormUtil::getPassedValue('startnum', 0);
         // this is needed because of onlyMyTasks
         if(empty($data['mode'])) {
             $data['mode']        = 'undone';
@@ -57,7 +62,7 @@ class Tasks_Controller_User extends Zikula_AbstractController
         $modes = ModUtil::apiFunc($this->name,'user','getModes');
         $this->view->assign('modes', $modes);        
         
-        $categories = ModUtil::apiFunc($this->name,'user','getCategories', 'list');
+        $categories = ModUtil::apiFunc($this->name,'user','getCategories', 'select');
         $this->view->assign('categories', $categories);
         
         
@@ -82,14 +87,21 @@ class Tasks_Controller_User extends Zikula_AbstractController
         }
 
         // Get form/request vars
-        $id = FormUtil::getPassedValue('id', isset($args['id']) ? $args['id'] : null, 'REQUEST');
+        $tid = FormUtil::getPassedValue('tid', isset($args['tid']) ? $args['tid'] : null, 'REQUEST');
 
-        $task = ModUtil::apiFunc('Tasks','user','getTask', $id );
+        $task = ModUtil::apiFunc($this->name,'user','getTask', $tid );
         $task['participants'] = implode(', ', $task['participants']);
 
         // Create and return output object
         $this->view->assign($task);
         return $this->view->fetch('user/view.tpl');
+    }
+    
+    
+    public function reminder($args)
+    {
+        $form = FormUtil::newForm($this->name, $this);
+        return $form->execute('user/reminder.tpl', new Tasks_Handler_Reminder());
     }
     
     
@@ -106,29 +118,17 @@ class Tasks_Controller_User extends Zikula_AbstractController
 
     public function modify($args)
     {
-        $form = FormUtil::newForm('Tasks', $this);
+        $form = FormUtil::newForm($this->name, $this);
         return $form->execute('user/modify.tpl', new Tasks_Handler_Modify());
     }
     
     
-        /**
-    * Add/Edit a task (gui)
-    *
-    * @param array $args POST/REQUEST vars
-    * @return The view var
-    */
-
-    public function participants($args)
-    {
-        $form = FormUtil::newForm('Tasks', $this);
-        return $form->execute('user/participants.tpl', new Tasks_Handler_Participants());
-    }
     
     
     public function ical()
     {
        
-        $tasks = ModUtil::apiFunc('Tasks','user','getTasks', array() );
+        $tasks = ModUtil::apiFunc($this->name,'user','getTasks', array() );
         foreach($tasks as $key => $value) {
             $tasks[$key]['due'] = str_replace('-', '', $value['deadline']);
         }
@@ -137,20 +137,6 @@ class Tasks_Controller_User extends Zikula_AbstractController
         echo $this->view->fetch('user/ical.tpl');
         die();
 
-    }
-    
-    
-        /**
-    * Add/Edit a task (gui)
-    *
-    * @param array $args POST/REQUEST vars
-    * @return The view var
-    */
-
-    public function importCSV($args)
-    {
-        $form = FormUtil::newForm('Tasks', $this);
-        return $form->execute('user/importCSV.tpl', new Tasks_Handler_ImportCSV());
     }
     
     

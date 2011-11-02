@@ -75,7 +75,12 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
             }
             $priorities[] = array('value' => $i, 'text' => $text);
         }
-        $this->view->assign('priorities',  $priorities );
+        $this->view->assign('priorities',  $priorities );        
+        
+        $availableCategories = ModUtil::apiFunc($this->name, 'User', 'getCategories', 'list');
+        $availableCategories = implode(', ', $availableCategories);
+        $this->view->assign('availableCategories',  $availableCategories );
+        
       
         
         return true;
@@ -88,7 +93,7 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         // switch between edit and create mode        
         if ($this->_tid) {        
             $url = ModUtil::url('Tasks', 'user', 'view', array(
-                'id' => $this->_tid
+                'tid' => $this->_tid
             ) );
         } else {
             $url = ModUtil::url('Tasks', 'user', 'main');
@@ -129,11 +134,12 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
                 $this->entityManager->remove($old_category);
                 $this->entityManager->flush();
             }
-
+            $new_task = false;
         } else {
             $data['cr_uid'] = UserUtil::getVar('uid');
             $data['cr_date'] = new DateTime;
             $task = new Tasks_Entity_Tasks();
+            $new_task = true;
         }
         
         if((int)$data['progress'] == 100 and $this->_progress != 100) {
@@ -141,9 +147,10 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         }
         
 
+        $participants = array();
         if(!empty($data['participants'])) {
-            $particants = explode(',', $data['participants']);
-            foreach($particants as $participant) {
+            $participants = explode(',', $data['participants']);
+            foreach($participants as $participant) {
                 $task->setParticipants($participant);
             }
         }
@@ -172,7 +179,14 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         $task->merge($data);
         $this->entityManager->persist($task);
         $this->entityManager->flush();
-
+        
+        if($new_task) {
+            ModUtil::apiFunc($this->name, 'Notification', 'newTask', array(
+                'users' => $participants,
+                'task'  => $task
+            ));
+        }
+        
         return $this->view->redirect($url);
     }
 

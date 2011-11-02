@@ -2,11 +2,20 @@
 {pagesetvar name='templatetitle' value=$title}
 <h2>
     <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='Tasks'}</a> &#187;
-    <a href="{modurl modname="Tasks" type='user' func='view' id=$tid}">{$title}</a>
+    <a href="{modurl modname="Tasks" type='user' func='view' tid=$tid}">{$title}</a>
 </h2>
+{insert name='getstatusmsg'}
 
 <br />
-{actions tid=$tid owner=$cr_uid style="button"}<br /><br /><br />
+{actions tid=$tid owner=$cr_uid style="button"}
+
+
+<div class="z-buttons">
+    <a href="{modurl modname='Tasks' type='user' func='reminder' tid=$tid}">
+        {img src='mail_generic.png' modname='core' set='icons/extrasmall' __alt='Send reminder' __title='Send reminder'}
+        {gt text="Send reminder"}
+    </a>
+</div><br /><br />
 
 
 <table class="z-datatable">

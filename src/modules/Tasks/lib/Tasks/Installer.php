@@ -21,17 +21,23 @@ class Tasks_Installer extends Zikula_AbstractInstaller
     */
     public function install()
     {
+        // create table
         try {
-            DoctrineUtil::createTablesFromModels('Tasks');
+            DoctrineHelper::createSchema($this->entityManager, array(
+                'Tasks_Entity_Tasks',
+                'Tasks_Entity_Participants',
+                'Tasks_Entity_CategoryMembership',
+                'Tasks_Entity_Categories'
+            ));
         } catch (Exception $e) {
-            LogUtil::registerStatus($e->__toString());
+            LogUtil::registerStatus($e->getMessage());
             return false;
         }
        
 
-        $this->setVar('enablecategorization', true);
+        //$this->setVar('enablecategorization', true);
         // insert default category
-        $this->createdefaultcategory('/__SYSTEM__/Modules/Tasks');
+        //$this->createdefaultcategory('/__SYSTEM__/Modules/Tasks');
 
         HookUtil::registerSubscriberBundles($this->version->getHookSubscriberBundles());
 
@@ -65,8 +71,13 @@ class Tasks_Installer extends Zikula_AbstractInstaller
     {
         HookUtil::unregisterSubscriberBundles($this->version->getHookSubscriberBundles());
 
-        // drop table
-        DoctrineUtil::dropTable('tasks');
+        // drop tables
+        /*DoctrineHelper::dropSchema($this->entityManager, array(
+            'Tasks_Entity_Tasks',
+            'Tasks_Entity_Participants',
+            'Tasks_Entity_CategoryMembership',
+            'Tasks_Entity_Categories'
+        ));*/
         // Delete any module variables
         $this->delVars();
 

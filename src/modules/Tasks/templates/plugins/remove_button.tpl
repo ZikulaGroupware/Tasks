@@ -13,7 +13,7 @@
 
     deleteIt = function(res) {
         if(res) {
-            var pars = "module=Tasks&func=remove&id={{$tid}}";
+            var pars = "module=Tasks&func={{$function}}&id={{$id}}";
             var myAjax = new Ajax.Request(
                 "ajax.php",
                 {

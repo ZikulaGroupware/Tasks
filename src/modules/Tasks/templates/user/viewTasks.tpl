@@ -1,6 +1,6 @@
 {gt text="Tasks" assign='templatetitle'}
 <h2>
-    <a href="modurl">
+    <a href="{modurl modname='Tasks' type='user' func='viewTasks'}">
         {$templatetitle}
     </a>
 </h2>
@@ -75,18 +75,18 @@
             
             {if $task.description}
             <div id="other{$task.tid}" class="tooltips2" title="#other{$task.tid}_content">
-                <a href="{modurl modname="Tasks" type='user' func="view" id=$task.tid}">{$task.title}</a>
+                <a href="{modurl modname="Tasks" type='user' func="view" tid=$task.tid}">{$task.title}</a>
             </div>
             <div id="other{$task.tid}_content" style="display:none;">{$task.description|notifyfilters:'tasks.filter_hooks.description.filter'}</div>
             {else}
-            <a href="{modurl modname="Tasks" type='user' func="view" id=$task.tid}">{$task.title}</a>
+            <a href="{modurl modname="Tasks" type='user' func="view" tid=$task.tid}">{$task.title}</a>
             {/if}
 
         </td>
         <td>{$task.priority}</td>
         <td align="center">{$task.progress|formatProgress}</td>
         <td>
-            {if $task.deadline}{$task.deadline->format('d.m.y')}{/if}
+            {if $task.deadline}{$task.deadline|formatDeadline}{/if}
         </td>
         <td>
             {formatParticipants p=$task.participants}
