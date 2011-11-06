@@ -42,8 +42,10 @@ class Tasks_Controller_Admin extends Zikula_AbstractController
     */
     public function viewCategories($args)
     {
-        $form = FormUtil::newForm('Tasks', $this);
-        return $form->execute('admin/modifyCategory.tpl', new Tasks_Handler_ModifyCategory());
+        $form = FormUtil::newForm('AlternativeCategories', $this);
+        $handler =new AlternativeCategories_Handler_Modify();
+        $handler->setEntity('Tasks_Entity_Categories');
+        return $form->execute('admin/modify.tpl', $handler);
     }
     
     

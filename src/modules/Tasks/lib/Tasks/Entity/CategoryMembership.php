@@ -27,17 +27,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 
 
-class Tasks_Entity_CategoryMembership extends Zikula_EntityAccess
+class Tasks_Entity_CategoryMembership extends AlternativeCategories_Entity_Membership
 {
-    
-    /**
-     * The following are annotations which define the id field.
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
     
 
     /**
@@ -57,21 +48,6 @@ class Tasks_Entity_CategoryMembership extends Zikula_EntityAccess
         $this->entity = $entity;
     }
     
-    
-    
-    /**
-     * The following are annotations which define the id field.
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $categoryId;
-    
-    
-    public function __construct($category, $entity) {
-        $this->categoryId = $category;
-        $this->entity     = $entity;
-    }
 
-     
     
 }

@@ -15,7 +15,7 @@
  */
 
 
-class Tasks_Controller_Ajax extends Zikula_AbstractController
+class Tasks_Controller_Ajax extends Zikula_Controller_AbstractAjax
 {
     /**
      * Post setup.
@@ -78,7 +78,7 @@ class Tasks_Controller_Ajax extends Zikula_AbstractController
      * @return void nothing, direct ouptut using echo!
      */
     public function getusers()
-    {
+    {        
         // Security check
         if (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_READ)) {
             AjaxUtil::error($this->__('Sorry! You do not have authorisation for this module.'));
@@ -86,9 +86,10 @@ class Tasks_Controller_Ajax extends Zikula_AbstractController
 
         $keyword = FormUtil::getPassedValue('keyword', '', 'POST');
         if (empty($keyword)) {
-            AjaxUtil::error($this->__('Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again.'));
+            //AjaxUtil::
+            //AjaxUtil::error($this->__('Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again.'));
         }
-
+        
         $pntable     = DBUtil::getTables();
         $userscolumn = $pntable['users_column'];
 
@@ -136,9 +137,9 @@ class Tasks_Controller_Ajax extends Zikula_AbstractController
 
         $keyword = FormUtil::getPassedValue('keyword', '', 'POST');
         if (empty($keyword)) {
-            AjaxUtil::error($this->__('Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again.'));
+           AjaxUtil::error($this->__('Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again.'));
         }
-
+        
         
         $em = $this->getService('doctrine.entitymanager');
         $qb = $em->createQueryBuilder();

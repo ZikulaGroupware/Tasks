@@ -4,8 +4,12 @@
 
 <h2>
     <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='Tasks'}</a> &#187;
+    {if isset($title)}
     <a href="{modurl modname="Tasks" type='user' func='view' tid=$tid}">{$title}</a> &#187;
-    {$templatetitle}
+    {gt text="Modify"}
+    {else}
+    {gt text="New"}
+    {/if}
 </h2>
 
 <div id="intercom">
@@ -26,30 +30,20 @@
         {formlabel for="priority" __text='Priority'}
         {formdropdownlist id="priority" items=$priorities}
     </div>
-    <div class="z-formrow">
+
+
+    <div id="chosenCss" class="z-formrow">
         {formlabel for="progress" __text='Progress'}
         {formdropdownlist id="progress" items=$percentages}
     </div>
 
 
-    <div class="z-formrow">
+    {ajaxheader modname='Tasks' filename='chosen/chosen.proto.min.js'}
+    {pageaddvar name='stylesheet' value='modules/Tasks/javascript/chosen/chosen.css'}
+    <div id="chosenCss" class="z-formrow">
         {formlabel for="categories" __text='Categories'}
-        {formtextinput size="40" maxLength="255" id="categories"}
-        <div id="list-categories">
-            <p class="default">{gt text="Notice: To send a private message to multiple groups, enter the group names separated by commas."}</p>
-            <ul class="feed">
-                {if $categories2}
-                {foreach from=$categories2 item='item'}
-                <li value="{$item|safetext}">{$item|safetext}</li>
-                {/foreach}
-                {/if}
-            </ul>
-        </div>
-        <em class="z-formnote z-sub">{gt text="Available categories"}: {$availableCategories}.</em>
+        {formdropdownlist id="categories" items=$allCategories cssClass="chzn-select" selectionMode='multiple'}
     </div>
-
-
-    
     
     <div class="z-formrow">
         {formlabel for="participants" __text='Participants'}
@@ -99,12 +93,7 @@
         tlist1 = new FacebookList(
             'participants',
             'list-user',
-            {fetchFile:document.location.pnbaseURL + 'ajax.php?module=Tasks'+'&'+'func=getusers'}
-        );
-        tlist2 = new FacebookList(
-            'categories',
-            'list-categories',
-            {fetchFile:document.location.pnbaseURL + 'ajax.php?module=Tasks'+'&'+'func=getcategories'}
+            {fetchFile:Zikula.Config.baseURL + 'ajax.php?module=Tasks'+'&'+'func=getusers'}
         );
     });
 </script>

@@ -44,14 +44,13 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
                 $this->_progress = (int)$task['progress'];
                 $task['participants2'] = $task['participants']; 
                 $task['participants'] = implode(',', $task['participants']);
-                $task['categories2'] = $task['categories']; 
-                $task['categories'] = implode(',', $task['categories']);
+                $task['categories'] = array_keys($task['categories']);
                 $view->assign($task);
             } else {
                 return LogUtil::registerError($this->__f('Task with tid %s not found', $tid));
             }
         } else {
-            $view->assign('templatetitle', $this->__('Create task'));
+            $view->assign('categories2', array());
             $this->_progress = 0;
         }
         $this->view->assign('dateformat', __('%Y-%m-%d') );
@@ -77,9 +76,8 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         }
         $this->view->assign('priorities',  $priorities );        
         
-        $availableCategories = ModUtil::apiFunc($this->name, 'User', 'getCategories', 'list');
-        $availableCategories = implode(', ', $availableCategories);
-        $this->view->assign('availableCategories',  $availableCategories );
+        $allCategories = ModUtil::apiFunc($this->name, 'User', 'getCategories', 'formdropdownlist');
+        $this->view->assign('allCategories',  $allCategories );
         
       
         
@@ -158,17 +156,8 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         
         
         if(!empty($data['categories'])) {
-            $categories = explode(',', $data['categories']);
-            foreach($categories as $category) {
-                $em = ServiceUtil::getService('doctrine.entitymanager');
-                $qb = $em->createQueryBuilder();
-                $qb->select('c')
-                   ->from('Tasks_Entity_Categories', 'c')
-                   ->where('c.name = :name')
-                   ->setParameter('name', $category);
-                $query = $qb->getQuery();
-                $result = $query->getArrayResult();
-                $task->setCategories($result[0]['id']);
+            foreach($data['categories'] as $id) {
+                $task->setCategories($id);
             }
         }
         unset($data['categories']);

@@ -84,7 +84,7 @@ class Tasks_Api_User extends Zikula_AbstractApi
             if($mode == "undone") {
                 $qb->where('t.progress < 100');
                 if(empty($orderBy)) {
-                    $qb->orderBy('t.progress', 'DESC');
+                    $qb->orderBy('t.deadline', 'ASC');
                 }
             } else if($mode == "done") {
                 $qb->where('t.progress = 100');
@@ -169,47 +169,10 @@ class Tasks_Api_User extends Zikula_AbstractApi
      * @return array query array | formdropdownlist array
      */    
     public function getCategories( $outputStyle = 'query' )
-    {        
-        
-                
-        $em = $this->getService('doctrine.entitymanager');
-        $qb = $em->createQueryBuilder();
-        $qb->select('c')
-           ->from('Tasks_Entity_Categories', 'c')
-           ->orderBy('c.name');
-        $query= $qb->getQuery();
-        $categories = $query->getArrayResult();  
-                
-        switch ($outputStyle) {
-            case 'query':
-                return $categories;
-            case 'formdropdownlist':
-                $formdropdownlist[] = array(
-                    'text'  => $this->__('All'),
-                    'value' => 'all'
-                );
-                foreach($categories as $category) {
-                    $formdropdownlist[] = array(
-                        'text'  => $category['name'],
-                        'value' => $category['id']
-                    );
-                }
-                return $formdropdownlist;
-            case 'list':
-                foreach($categories as $category) {
-                    $list[$category['id']] = $category['name'];
-                }
-                return $list;
-            case 'select':
-                $select['all'] = $this->__('All');
-                foreach($categories as $category) {
-                    $select[$category['id']] = $category['name'];
-                }
-                return $select;
-            default:
-                return $categories;
-        }        
-        
+    {
+        $args['entity']      = 'Tasks_Entity_Categories';
+        $args['outputStyle'] = $outputStyle;
+        return ModUtil::apiFunc('AlternativeCategories', 'User', 'getCategories', $args);
     }
     
     

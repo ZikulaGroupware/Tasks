@@ -26,42 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 
 
-class Tasks_Entity_Categories extends Zikula_EntityAccess
+class Tasks_Entity_Categories extends AlternativeCategories_Entity_All
 {
-    
-    /**
-     * The following are annotations which define the id field.
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    
-    
-    public function getId()
-    {
-        return $this->id;
-    }
-    
-    /**
-     * The following are annotations which define the name field.
-     *
-     * @ORM\Column(type="string")
-     */
-    private $name;
-    
-    
-    public function getName()
-    {
-        return $this->name;
-    }
-    
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-    
- 
     
 }
