@@ -42,14 +42,14 @@ class Tasks_Controller_User extends Zikula_AbstractController
         }
         
         $data['mode']        = FormUtil::getPassedValue('mode');
-        $data['onlyMyTasks'] = FormUtil::getPassedValue('onlyMyTasks', false); 
+        $data['participant'] = FormUtil::getPassedValue('participant', 1); 
         $data['category']    = FormUtil::getPassedValue('category', 'all');
         $data['limit']       = FormUtil::getPassedValue('limit', 10);
-        $data['startnum']    = FormUtil::getPassedValue('startnum', 0);
-        // this is needed because of onlyMyTasks
+        $data['startnum']    = FormUtil::getPassedValue('startnum', 1);
+        $data['search']      = FormUtil::getPassedValue('search', '');
         if(empty($data['mode'])) {
             $data['mode']        = 'undone';
-            $data['onlyMyTasks'] = true;
+            $data['participant'] = 1;
         }
         $this->view->assign($data);
         $data['paginator'] = true; 
@@ -68,6 +68,17 @@ class Tasks_Controller_User extends Zikula_AbstractController
         
         $items_per_page = ModUtil::apiFunc($this->name,'user','getItemsPerPage'); 
         $this->view->assign('items_per_page', $items_per_page);
+        
+        
+        $users[1] = $this->__('Only my tasks');
+        $users[2] = $this->__('All tasks');
+        $this->view->assign('users', $users);
+        $otherUsers = UserUtil::getUsers( $where =
+            "activated = 1 and ".
+            "uname != '".UserUtil::getVar('uname')."' and ".
+            "uname != 'guest'"
+        );
+        $this->view->assign('otherUsers', $otherUsers);
         
         return $this->view->fetch('user/viewTasks.tpl');
     }

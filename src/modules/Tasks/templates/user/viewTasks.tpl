@@ -1,4 +1,5 @@
 {gt text="Tasks" assign='templatetitle'}
+{pagesetvar name='title' value=$templatetitle}
 <h2>
     <a href="{modurl modname='Tasks' type='user' func='viewTasks'}">
         {$templatetitle}
@@ -13,6 +14,11 @@
 <form class="z-form" action="{modurl modname="Tasks" type="user" func="viewTasks"}" method="post" enctype="application/x-www-form-urlencoded">
     <fieldset>
 
+        <input type="text" name="search" value="{$search}" style="
+            background-image:url(modules/Tasks/images/search.png);
+            background-repeat:no-repeat;
+            background-position:right center;
+        " />
 
         <select id="mode" name="mode">
         {foreach from=$modes item="text" key='value'}
@@ -23,9 +29,18 @@
         </select>
 
 
-
-        <input name="onlyMyTasks" type="checkbox" {if $onlyMyTasks}checked{/if} />
-        {gt text='Only my tasks'}
+        <select id="category" name="participant">
+        {foreach from=$users item="text" key='value'}
+            <option value="{$value}" {if $participant eq $value}selected="selected"{/if}>
+                {$text}
+            </option>
+        {/foreach}
+        {foreach from=$otherUsers item="value"}
+            <option value="{$value.uname}" {if $participant eq $value.uname}selected="selected"{/if}>
+                {$value.uname}
+            </option>
+        {/foreach}
+        </select>
 
 
         <select id="category" name="category">

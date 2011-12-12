@@ -1,7 +1,10 @@
 {pageaddvar name='javascript' value='javascript/helpers/Zikula.UI.js'}
-{pagesetvar name='templatetitle' value=$title}
+{gt text="Tasks" assign='maintitle'}
+{pagesetvar name='title' value="$maintitle :: $title"}
+
+
 <h2>
-    <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='Tasks'}</a> &#187;
+    <a href="{modurl modname="Tasks" type='user' func='main'}">{$maintitle}</a> &#187;
     <a href="{modurl modname="Tasks" type='user' func='view' tid=$tid}">{$title}</a>
 </h2>
 {insert name='getstatusmsg'}

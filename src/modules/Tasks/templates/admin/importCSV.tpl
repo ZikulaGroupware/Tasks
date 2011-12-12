@@ -58,7 +58,7 @@
     </tr>
     </thead>
     <tbody>
-    {foreach from=$test item='task'}
+    {foreach from="$test" item="task"}
     <tr class="{cycle values='z-odd,z-even'}">
         <td>{$task.title}</td>
         <td>{$task.description}</td>

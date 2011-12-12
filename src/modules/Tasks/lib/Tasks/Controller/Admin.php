@@ -35,7 +35,7 @@ class Tasks_Controller_Admin extends Zikula_AbstractController
     
     
    /**
-    * Import a CSV input
+    * View and modify categories
     *
     * @param array $args POST/REQUEST vars
     * @return The view var

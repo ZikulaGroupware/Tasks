@@ -107,14 +107,18 @@ class Tasks_Api_User extends Zikula_AbstractApi
 
        if(!empty($search)) {
             $search = '%'.$search.'%';
-            $qb->andWhere('t.title like ? or t.description like ?', array($search,$search));
+            $qb->andWhere('t.title like :search or t.description like :search')
+               ->setParameter( 'search', $search);
         }
         
         
-        if(!empty($onlyMyTasks) and $onlyMyTasks !== false) {
+        if(!empty($participant) and $participant != 2) {
+           if($participant == 1) {
+               $participant = UserUtil::getVar('uname');
+           }
            $qb->leftJoin('t.participants', 'q')
               ->andWhere('q.uname = :uname')
-              ->setParameter('uname', UserUtil::getVar('uname'));
+              ->setParameter('uname', $participant);
         }
         
         
@@ -128,9 +132,13 @@ class Tasks_Api_User extends Zikula_AbstractApi
         
         $query = $qb->getQuery();  
         
-        if( !empty($paginator) and !empty($limit)) {      
+        
+        if( !empty($paginator) and !empty($limit)) {
+            if(empty($startnum) ) {
+                $startnum = 1;
+            }
             $count = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);
-            $paginateQuery = \DoctrineExtensions\Paginate\Paginate::getPaginateQuery($query, $startnum, $limit); // Step 2 and 3
+            $paginateQuery = \DoctrineExtensions\Paginate\Paginate::getPaginateQuery($query, $startnum -1 , $limit); // Step 2 and 3
             $result = $paginateQuery->getArrayResult();
         } else {
             $result = $query->getArrayResult();

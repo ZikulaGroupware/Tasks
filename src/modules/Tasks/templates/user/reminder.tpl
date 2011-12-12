@@ -2,10 +2,15 @@
 {pageaddvar name="javascript" value="modules/Tasks/javascript/facebooklist.js"}
 {pageaddvar name="stylesheet" value="modules/Tasks/style/facebooklist.css"}
 
+{gt text="Tasks" assign='maintitle'}
+{gt text='Send reminder' assign="action"}
+{pagesetvar name='title' value="$maintitle :: $title :: $action"}
+
+
 <h2>
-    <a href="{modurl modname="Tasks" type='user' func='main'}">{gt text='Tasks'}</a> &#187;
+    <a href="{modurl modname="Tasks" type='user' func='main'}">{$maintitle}</a> &#187;
     <a href="{modurl modname="Tasks" type='user' func='view' tid=$tid}">{$title}</a> &#187;
-    {gt text='Send reminder'}
+    {$action}
 </h2>
 
 <div id="intercom">
