@@ -16,17 +16,37 @@
 
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
- * Wikula links entity class.
+ * Tasks entity class.
  *
  * Annotations define the entity mappings to database.
  *
  * @ORM\Entity
- * @ORM\Table(name="tasks_categories")
+ * @ORM\Table(name="tasks_categories",
+ *            uniqueConstraints={@ORM\UniqueConstraint(name="cat_unq",columns={"registryId", "categoryId", "entityId"})})
  */
-
-
-class Tasks_Entity_Categories extends AlternativeCategories_Entity_All
+class Tasks_Entity_Categories extends Zikula_Doctrine2_Entity_EntityCategory
 {
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="Tasks_Entity_Tasks", inversedBy="categories")
+     * @ORM\JoinColumn(name="entityId", referencedColumnName="tid")
+     * @var Tasks_Entity_Tasks
+     */
+    private $entity;
+
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+    }
+
+    
+    
     
 }
