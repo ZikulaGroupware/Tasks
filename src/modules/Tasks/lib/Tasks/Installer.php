@@ -26,22 +26,17 @@ class Tasks_Installer extends Zikula_AbstractInstaller
             DoctrineHelper::createSchema($this->entityManager, array(
                 'Tasks_Entity_Tasks',
                 'Tasks_Entity_Participants',
-                'Tasks_Entity_CategoryMembership',
+                //'Tasks_Entity_CategoryMembership',
                 'Tasks_Entity_Categories'
             ));
         } catch (Exception $e) {
             LogUtil::registerStatus($e->getMessage());
             return false;
         }
-       
 
-        //$this->setVar('enablecategorization', true);
-        // insert default category
-        //$this->createdefaultcategory('/__SYSTEM__/Modules/Tasks');
+        $this->createdefaultcategories();
 
         HookUtil::registerSubscriberBundles($this->version->getHookSubscriberBundles());
-
-
         
         // Initialisation successful
         return true;
@@ -72,12 +67,12 @@ class Tasks_Installer extends Zikula_AbstractInstaller
         HookUtil::unregisterSubscriberBundles($this->version->getHookSubscriberBundles());
 
         // drop tables
-        /*DoctrineHelper::dropSchema($this->entityManager, array(
+        DoctrineHelper::dropSchema($this->entityManager, array(
             'Tasks_Entity_Tasks',
             'Tasks_Entity_Participants',
-            'Tasks_Entity_CategoryMembership',
+            //'Tasks_Entity_CategoryMembership',
             'Tasks_Entity_Categories'
-        ));*/
+        ));
         // Delete any module variables
         $this->delVars();
 
@@ -87,107 +82,26 @@ class Tasks_Installer extends Zikula_AbstractInstaller
 
 
 
-    function createdefaultcategory($regpath = '/__SYSTEM__/Modules/Global')
+    function createdefaultcategories()
     {
 
-            // load necessary classes
-            Loader::loadClass('CategoryUtil');
-
-            if (!$cat = $this->createcategory(array(
-                'rootpath'    => '/__SYSTEM__/Modules',
-                'name'        => 'Tasks',
-                'displayname' => __('Tasks'),
-                'description' => __('to-do list for Zikula')))) {
-                return false;
-            }
-
-            // get the category path to insert upgraded Tasks categories
-            $rootcat = CategoryUtil::getCategoryByPath($regpath);
-            if ($rootcat) {
-                // create an entry in the categories registry to the Main property
-                $this->create_regentry($rootcat, array(
-                    'modname'  => 'Tasks',
-                    'table'    => 'tasks',
-                    'property' => __('Main')));
-            } else {
-                return false;
-            }
-
-            LogUtil::registerStatus(__("Tasks: 'Main' category created."));
-            return true;
-    }
-
-
-
-    /**
-    * create category
-    * @author Craig Heydenburg
-    */
-    function createcategory($catarray)
-    {
-        // expecting array(rootpath=>'', name=>'', displayname=>'', description=>'', attributes=>array())
-        // load necessary classes
-        Loader::loadClass('CategoryUtil');
-        Loader::loadClassFromModule('Categories', 'Category');
-        Loader::loadClassFromModule('Categories', 'CategoryRegistry');
-
-        // get the language file
-        $lang = ZLanguage::getLanguageCode();
-
-        // get the category path to insert category
-        $rootcat = CategoryUtil::getCategoryByPath($catarray['rootpath']);
-        $nCat = CategoryUtil::getCategoryByPath($catarray['rootpath'] . "/" . $catarray['name']);
-
-        if (!$nCat) {
-            $cat = new Categories_DBObject_Category();
-            $data = $cat->getData();
-            $data['parent_id'] = $rootcat['id'];
-            $data['name'] = $catarray['name'];
-            if (isset($catarray['value'])) {
-                $data['value'] = $catarray['value'];
-            }
-            $data['display_name'] = array(
-                $lang => $catarray['displayname']);
-            $data['display_desc'] = array(
-                $lang => $catarray['description']);
-            if ((isset($catarray['attributes'])) && is_array($catarray['attributes'])) {
-                foreach ($catarray['attributes'] as $name => $value) {
-                    $data['__ATTRIBUTES__'][$name] = $value;
-                }
-            }
-            $cat->setData($data);
-            if (!$cat->validate('admin')) {
-                return false;
-            }
-            $cat->insert();
-            $cat->update();
-            return $cat->getDataField('id');
+        if (!$cat = CategoryUtil::createCategory('/__SYSTEM__/Modules', 'Tasks', null, $this->__('Tasks'), $this->__('Tasks categories'))) {
+            return false;
         }
-        return -1;
-    }
+        
+        $rootcat = CategoryUtil::getCategoryByPath('/__SYSTEM__/Modules/Tasks');
+        CategoryRegistryUtil::insertEntry('Tasks', 'Tasks', 'Main', $rootcat['id']);
 
+        CategoryUtil::createCategory('/__SYSTEM__/Modules/Tasks', 'category1', null, $this->__('Category 1'), $this->__('Category 1'));
+        CategoryUtil::createCategory('/__SYSTEM__/Modules/Tasks', 'category1', null, $this->__('Category 1'), $this->__('This is category 1'));
 
-    /**
-    * create an entry in the categories registry
-    * @author Craig Heydenburg
-    */
-    function create_regentry($rootcat, $data)
-    {
-        // expecting $rootcat - rootcategory info
-        // expecting array(modname=>'', table=>'', property=>'')
-        // load necessary classes
-        Loader::loadClass('CategoryUtil');
-        Loader::loadClassFromModule('Categories', 'Category');
-        Loader::loadClassFromModule('Categories', 'CategoryRegistry');
-
-        $registry = new Categories_DBObject_Registry();
-        $registry->setDataField('modname',     $data['modname']);
-        $registry->setDataField('table',       $data['table']);
-        $registry->setDataField('property',    $data['property']);
-        $registry->setDataField('category_id', $rootcat['id']);
-        $registry->insert();
-
+        
+        LogUtil::registerStatus($this->__("Tasks: 'Main' categories created."));
         return true;
     }
+
+
+
+    
 
 }

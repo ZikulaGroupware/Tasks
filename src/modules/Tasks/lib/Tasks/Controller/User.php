@@ -35,7 +35,7 @@ class Tasks_Controller_User extends Zikula_AbstractController
     */
 
     public function viewTasks()
-    {
+    {   
         // Security check
         if (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_READ)) {
             return LogUtil::registerPermissionError();
@@ -101,10 +101,14 @@ class Tasks_Controller_User extends Zikula_AbstractController
         $tid = FormUtil::getPassedValue('tid', isset($args['tid']) ? $args['tid'] : null, 'REQUEST');
 
         $task = ModUtil::apiFunc($this->name,'user','getTask', $tid );
-        $task['participants'] = implode(', ', $task['participants']);
+        //$task['participants'] = implode(', ', $task['participants']);
 
         // Create and return output object
-        $this->view->assign($task);
+        $this->view->assign($task->toArray());
+        
+        $task = $task->toArray();
+        
+                
         return $this->view->fetch('user/view.tpl');
     }
     

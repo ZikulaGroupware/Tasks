@@ -68,15 +68,15 @@
     <tr class="{cycle values='z-odd,z-even'}">
         <td>{gt text='Categories'}</td>
         <td>
-        {foreach from=$categories item='name'}
-            {$name|safetext}
+        {foreach from=$categories item='c'}
+            {$c.category.name|safetext}
         {/foreach}
         </td>
     </tr>
-    <tr class="{cycle values='z-odd,z-even'}">
+    {*<tr class="{cycle values='z-odd,z-even'}">
         <td>{gt text='Participants'}</td>
         <td>{$participants}</td>
-    </tr>
+    </tr>*}
     </tbody>
 </table>
 

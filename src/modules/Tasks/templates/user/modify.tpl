@@ -1,4 +1,4 @@
-{pageaddvar name="javascript" value="prototype"}
+{*pageaddvar name="javascript" value="prototype"*}
 {pageaddvar name="javascript" value="modules/Tasks/javascript/facebooklist.js"}
 {pageaddvar name="stylesheet" value="modules/Tasks/style/facebooklist.css"}
 
@@ -36,51 +36,33 @@
         {formlabel for="priority" __text='Priority'}
         {formdropdownlist id="priority" items=$priorities}
     </div>
-
-
-    <div id="chosenCss" class="z-formrow">
-        {formlabel for="progress" __text='Progress'}
-        {formdropdownlist id="progress" items=$percentages}
-    </div>
-
-
-    {ajaxheader modname='Tasks' filename='chosen/chosen.proto.min.js'}
-    {pageaddvar name='stylesheet' value='modules/Tasks/javascript/chosen/chosen.css'}
-    <div id="chosenCss" class="z-formrow">
-        {formlabel for="categories" __text='Categories'}
-        {formdropdownlist id="categories" items=$allCategories cssClass="chzn-select" selectionMode='multiple'}
-    </div>
     
-    <div class="z-formrow">
-        {formlabel for="participants" __text='Participants'}
-        {formtextinput size="40" maxLength="255" id="participants"}
-        <div id="list-user">
-            <p class="default">{gt text="Notice: Please choose a user"}</p>
-            <ul class="feed">
-                {if $participants2}
-                {foreach from=$participants2 item='item'}
-                <li value="{$item|safetext}">{$item|safetext}</li>
-                {/foreach}
-                {/if}
-            </ul>
+
+    {*ajaxheader modname='Tasks' filename='chosen/chosen.proto.min.js'}
+    {pageaddvar name='stylesheet' value='modules/Tasks/javascript/chosen/chosen.css'*}
+    {foreach from=$registries item="registryCid" key="registryId"}
+        <div class="z-formrow">
+            {formlabel for="categories_`$registryId`" __text="Categories"}
+            {formcategoryselector id="categories_`$registryId`" category=$registryCid dataField="categories" group="tasks" registryId=$registryId doctrine2=true}
         </div>
-    </div>
+    {/foreach}
+    
+    
 
 
 
 
-    <div class="z-formrow">
+    {*<div class="z-formrow">
         {formlabel for="deadline" __text='Deadline'}
         {formdateinput id="deadline" useSelectionMode=1 ifFormat=$dateformat daFormat='%e. %B %Y'}
-    </div>
+    </div>*}
 
 
     <div class="z-formrow">
         {formtextinput textMode="multiline" rows='4' cols='100' id="description" style="width:98%;height:200px"}
     </div>
     {notifydisplayhooks eventname='tasks.ui_hooks.editor.display_view' id='description'}
-
-
+    
 </fieldset>
 
 

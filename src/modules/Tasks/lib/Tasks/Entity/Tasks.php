@@ -61,6 +61,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
         $this->title = $title;
     }
     
+    
+    public function getTitle()
+    {
+        return $this->title;
+    }
+    
     /**
      * The following are annotations which define the id field.
      *
@@ -71,6 +77,11 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+    
+    public function getDescription()
+    {
+        return $this->description;
     }
  
     
@@ -86,6 +97,11 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
         $this->done_date = $done_date;
     }
     
+    public function getDone_date()
+    {
+        return $this->done_date;
+    }
+    
     
     /**
      * The following are annotations which define the id field.
@@ -97,6 +113,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     public function setCr_uid($cr_uid)
     {
         $this->cr_uid = $cr_uid;
+    }
+    
+    
+    public function getCr_uid()
+    {
+        return $this->cr_uid;
     }
     
     /**
@@ -111,6 +133,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
         $this->cr_date = $cr_date;
     }
     
+    public function getCr_date()
+    {
+        return $this->cr_date;
+    }
+    
+    
     /**
      * The following are annotations which define the id field.
      *
@@ -124,6 +152,11 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     }
     
     
+    public function getDeadline()
+    {
+        return $this->deadline;
+    }
+    
     
     /**
      * The following are annotations which define the id field.
@@ -135,6 +168,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     public function setProgress($progress)
     {
         $this->progress = $progress;
+    }
+    
+    
+    public function getProgress()
+    {
+        return $this->progress;
     }
     
     
@@ -151,6 +190,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
         $this->priority = $priority;
     }
     
+    
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+    
 
     /**
      * The following are annotations which define the id field.
@@ -165,20 +210,36 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     }
     
     
+    public function getApproved()
+    {
+        return $this->approved;
+    }
+    
+
     /**
-     * @ORM\OneToMany(targetEntity="Tasks_Entity_CategoryMembership", 
+     * @ORM\OneToMany(targetEntity="Tasks_Entity_Categories", 
      *                mappedBy="entity", cascade={"all"}, 
      *                orphanRemoval=true)
      */
     private $categories;
+
+
     
-    
-    
-    
-    
-    public function setCategories($category)
+    public function getCategories()
     {
-        $this->categories[] = new Tasks_Entity_CategoryMembership($category, $this);
+        return $this->categories;
+    }
+    
+    
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+    }
+    
+    
+    public function setUser()
+    {
+        
     }
     
     
@@ -192,6 +253,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     private $participants;
     
     
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+    
+    
     public function setParticipants($participant)
     {
         $this->participants[] = new Tasks_Entity_Participants($participant, $this);
@@ -199,13 +266,12 @@ class Tasks_Entity_Tasks extends Zikula_EntityAccess
     
     
     
-
-
-    
     public function __construct()
     {
         $this->categories   = new Doctrine\Common\Collections\ArrayCollection();
         $this->participants = new Doctrine\Common\Collections\ArrayCollection();
     }
+    
+    
     
 }

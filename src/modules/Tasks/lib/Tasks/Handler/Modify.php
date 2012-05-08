@@ -20,7 +20,7 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
      *
      * @var integer
      */
-    private $_tid;
+    private $_task;
     private $_progress;
 
     
@@ -29,31 +29,36 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
     {
         if ((!UserUtil::isLoggedIn()) || (!SecurityUtil::checkPermission('Tasks::', '::', ACCESS_EDIT))) {
             return LogUtil::registerPermissionError();
-        }       
-
+        }    
         
+                
         $tid = FormUtil::getPassedValue('tid', null, "GET", FILTER_SANITIZE_NUMBER_INT);
 
-         if ($tid) {
-            $view->assign('templatetitle', $this->__('Modify Task'));
-            
-            $task = ModUtil::apiFunc('Tasks','user','getTask', $tid );
+        if ($tid) {
+            // load user with id
+            $task = $this->entityManager->find('Tasks_Entity_Tasks', $tid);
 
-            if ($task) {
-                $this->_tid = $tid;
-                $this->_progress = (int)$task['progress'];
-                $task['participants2'] = $task['participants']; 
-                $task['participants'] = implode(',', $task['participants']);
-                $task['categories'] = array_keys($task['categories']);
-                $view->assign($task);
-            } else {
-                return LogUtil::registerError($this->__f('Task with tid %s not found', $tid));
+            if (!$task) {
+                return LogUtil::registerError($this->__f('Task with id %s not found', $tid));
             }
+            $view->assign('templatetitle', $this->__('Modify Task'));
+            $this->_progress = (int)$task->getProgress();
+            
+            
         } else {
-            $view->assign('categories2', array());
+            $task = new Tasks_Entity_Tasks();
             $this->_progress = 0;
         }
-        $this->view->assign('dateformat', __('%Y-%m-%d') );
+        
+
+        // assign current values to form fields
+        $view->assign('tasks', $task)
+             ->assign($task->toArray());
+        
+        
+        
+        
+        $this->view->assign('dateformat', $this->__('%Y-%m-%d') );
                 
 
         $percentages = array();
@@ -74,12 +79,14 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
             }
             $priorities[] = array('value' => $i, 'text' => $text);
         }
-        $this->view->assign('priorities',  $priorities );        
+        $this->view->assign('priorities',  $priorities );
         
-        $allCategories = ModUtil::apiFunc($this->name, 'User', 'getCategories', 'formdropdownlist');
-        $this->view->assign('allCategories',  $allCategories );
+
+        // load categories
+        $categories = CategoryRegistryUtil::getRegisteredModuleCategories('Tasks', 'Tasks', 'id');
+        $view->assign('registries', $categories);
         
-      
+        $this->_task = $task;
         
         return true;
     }
@@ -88,10 +95,13 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
 
     function handleCommand(Zikula_Form_View $view, &$args)
     {
+        $task = $this->_task;
+        
+        
         // switch between edit and create mode        
-        if ($this->_tid) {        
+        if ($task) {        
             $url = ModUtil::url('Tasks', 'user', 'view', array(
-                'tid' => $this->_tid
+                'tid' => $task->getTid()
             ) );
         } else {
             $url = ModUtil::url('Tasks', 'user', 'main');
@@ -109,17 +119,22 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         
 
 
-        // load form values
+        // load form valuest
         $data = $view->getValues();
         
+        $task->merge($data);
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
         
+
+        return true;
         
         // switch between edit and create mode        
-        if ($this->_tid) {
+       /* if ($this->_tid) {
             $task = $this->entityManager->find('Tasks_Entity_Tasks', $this->_tid);
             
             // remove old participants
-            $old_participants = $this->entityManager->getRepository('Tasks_Entity_Participants')
+            /*$old_participants = $this->entityManager->getRepository('Tasks_Entity_Participants')
                                                     ->findBy(array('entity' => $this->_tid));
             foreach($old_participants as $old_participant) {
                 $this->entityManager->remove($old_participant);
@@ -142,10 +157,10 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         
         if((int)$data['progress'] == 100 and $this->_progress != 100) {
             $data['done_date'] = new DateTime;;
-        }
+        }*/
         
 
-        $participants = array();
+        /*$participants = array();
         if(!empty($data['participants'])) {
             $participants = explode(',', $data['participants']);
             foreach($participants as $participant) {
@@ -160,10 +175,10 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
                 $task->setCategories($id);
             }
         }
-        unset($data['categories']);
+        unset($data['categories']);*/
         
         
-        $data['deadline'] = new DateTime($data['deadline']);
+        //$data['deadline'] = new DateTime($data['deadline']);
         
         $task->merge($data);
         $this->entityManager->persist($task);
@@ -175,7 +190,6 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
                 'task'  => $task
             ));
         }
-        
         return $this->view->redirect($url);
     }
 

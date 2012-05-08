@@ -25,8 +25,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="tasks_participants",
  *            uniqueConstraints={@ORM\UniqueConstraint(name="cat_unq",columns={"uname", "entityId"})})
  */
-
-
 class Tasks_Entity_Participants extends Zikula_EntityAccess
 {
     
@@ -43,7 +41,7 @@ class Tasks_Entity_Participants extends Zikula_EntityAccess
     /**
      * @ORM\ManyToOne(targetEntity="Tasks_Entity_Tasks", inversedBy="participants")
      * @ORM\JoinColumn(name="entityId", referencedColumnName="tid")
-     * @var ExampleDoctrine_Entity_User
+     * @var Tasks_Entity_Tasks
      */
     private $entity;
     

@@ -8,7 +8,6 @@
 
 <br />
 
-
 {add}
 
 <form class="z-form" action="{modurl modname="Tasks" type="user" func="viewTasks"}" method="post" enctype="application/x-www-form-urlencoded">

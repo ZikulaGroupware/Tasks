@@ -23,14 +23,18 @@ class Tasks_Api_User extends Zikula_AbstractApi
 
     public function getTask($tid)
     {
+        return $this->entityManager->find('Tasks_Entity_Tasks', $tid);
+        
+        
+        
         $em = $this->getService('doctrine.entitymanager');
         $qb = $em->createQueryBuilder();
-        $qb->select('t, p, c')
+        $qb->select('t, p')
            ->from('Tasks_Entity_Tasks', 't')
            ->where('t.tid = :tid')
            ->setParameter('tid', $tid)
-           ->leftJoin('t.participants', 'p')
-           ->leftJoin('t.categories', 'c');
+           ->leftJoin('t.participants', 'p');
+           //->leftJoin('t.categories', 'c');
          //  ->leftJoin('c.name', 'n');
         $query = $qb->getQuery();
         $result = $query->getArrayResult();
@@ -42,13 +46,13 @@ class Tasks_Api_User extends Zikula_AbstractApi
         
         
         
-        $all_categories = $this->getCategories('list');
+        /*$all_categories = $this->getCategories('list');
         $categories = array();
         foreach($task['categories'] as $value) {
             $id  = $value['categoryId'];
             $categories[$id] = $all_categories[$id];
         }
-        $task['categories']  = $categories;
+        $task['categories']  = $categories;*/
         
         $participants = array();
         foreach($task['participants'] as $value) {
@@ -176,11 +180,19 @@ class Tasks_Api_User extends Zikula_AbstractApi
      * @param $outputStyle string output style (query|list|select|formdropdownlist)
      * @return array query array | formdropdownlist array
      */    
-    public function getCategories( $outputStyle = 'query' )
+    public function getCategories($outputStyle = 'query' )
     {
-        $args['entity']      = 'Tasks_Entity_Categories';
-        $args['outputStyle'] = $outputStyle;
-        return ModUtil::apiFunc('AlternativeCategories', 'User', 'getCategories', $args);
+        
+        $mainCategory = CategoryRegistryUtil::getRegisteredModuleCategories('Tasks', 'Tasks');
+        $output = array();
+        foreach(CategoryUtil::getCategoriesByParentID($mainCategory['Main']) as $category) {
+            $output[] = array(
+                'text' => $category['name'],
+                'value' => $category['name'],
+            );
+        }
+        return $output;
+        
     }
     
     
@@ -227,6 +239,65 @@ class Tasks_Api_User extends Zikula_AbstractApi
         }
 
     }
+    
+    
+    
+            
+    /**
+     * decode a short url
+     * 
+     * @param args array page arguments
+     */
+    public function decodeurl($args)
+    {
+        // check we actually have some vars to work with...
+        if (!isset($args['vars'])) {
+            return LogUtil::registerArgsError();
+        }
+        
+                
+        if (!isset($args['vars'][2])) {
+            return;            
+        }
+        
+        System::queryStringSetVar('tid', $args['vars'][2]);
+        
+        
+        if (isset($args['vars'][3])) {
+            System::queryStringSetVar('func', $args['vars'][3]);           
+        } else {
+            System::queryStringSetVar('func', 'view');
+        }
+    }
+    
+    
+    
+    /**
+     * encode an url into a shorturl
+     * 
+     * @param vars array page variables
+     */
+    public function encodeurl($vars)
+    {
+        $shorturl = $vars['modname'];
+        
+        if ($vars['func'] == 'main' || $vars['func'] == 'viewTasks') {
+            return $shorturl;
+        }
+        
+        
+        if (isset($vars['args']['tid'])) {
+            $shorturl .= '/'.$vars['args']['tid'];            
+        }
+        
+        if ($vars['func'] != 'view') {
+            $shorturl .= '/'.$vars['func'];
+        }
+        
+        return $shorturl;
+    }
+
+    
    
     
 }
