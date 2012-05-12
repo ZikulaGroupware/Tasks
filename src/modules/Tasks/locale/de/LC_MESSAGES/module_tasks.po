@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tasks\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-02 14:44+0100\n"
-"PO-Revision-Date: 2011-11-02 14:45+0100\n"
+"POT-Creation-Date: 2012-05-12 22:06+0200\n"
+"PO-Revision-Date: 2012-05-12 22:07+0100\n"
 "Last-Translator: Fabian Wuertz <dev@wuertz.org>\n"
 "Language-Team: Tasks development team\n"
 "MIME-Version: 1.0\n"
@@ -19,10 +19,9 @@ msgstr ""
 "X-Poedit-Country: GERMANY\n"
 
 #: lib/Tasks/Api/Admin.php:28
-#: templates/admin/modifyCategory.tpl:4
-#: templates/user/modify.tpl:38
-#: templates/user/view.tpl:66
-#: templates/user/viewTasks.tpl:67
+#: templates/user/modify.tpl:49
+#: templates/user/view.tpl:71
+#: templates/user/viewTasks.tpl:88
 msgid "Categories"
 msgstr "Kategorien"
 
@@ -39,87 +38,78 @@ msgstr "Es gibt wieder was zu tun"
 msgid "Error! Could not load any articles."
 msgstr ""
 
-#: lib/Tasks/Api/User.php:188
-#: lib/Tasks/Api/User.php:204
-msgid "All"
-msgstr "Alle"
-
-#: lib/Tasks/Api/User.php:224
+#: lib/Tasks/Api/User.php:152
 msgid "Undone tasks"
 msgstr "Unvollständige Aufgaben"
 
-#: lib/Tasks/Api/User.php:225
+#: lib/Tasks/Api/User.php:153
 msgid "Completed tasks"
 msgstr "Erledigte Aufgaben"
 
-#: lib/Tasks/Api/User.php:226
+#: lib/Tasks/Api/User.php:154
+#: templates/user/viewTasks.tpl:37
 msgid "All tasks"
 msgstr "Alle Aufgaben"
 
+#: lib/Tasks/Api/User.php:208
+#: lib/Tasks/Api/User.php:241
+msgid "new"
+msgstr "neu"
+
 #: lib/Tasks/Controller/Ajax.php:84
-#: lib/Tasks/Controller/Ajax.php:134
+#: lib/Tasks/Controller/Ajax.php:135
 msgid "Sorry! You do not have authorisation for this module."
 msgstr ""
 
-#: lib/Tasks/Controller/Ajax.php:89
-#: lib/Tasks/Controller/Ajax.php:139
-msgid "Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again."
+#: lib/Tasks/Controller/Ajax.php:107
+#: lib/Tasks/Controller/Ajax.php:152
+msgid "Error! Could not load data."
 msgstr ""
 
-#: lib/Tasks/Controller/Ajax.php:106
-#: lib/Tasks/Controller/Ajax.php:151
-msgid "Error! Could not load data."
+#: lib/Tasks/Controller/Ajax.php:140
+msgid "Error! The action you wanted to perform was not successful for some reason, maybe because of a problem with what you input. Please check and try again."
 msgstr ""
 
 #: lib/Tasks/Handler/ImportCSV.php:171
 msgid "Import successful"
 msgstr "Import erfolgreich"
 
-#: lib/Tasks/Handler/Modify.php:38
+#: lib/Tasks/Handler/Modify.php:42
+#: lib/Tasks/Handler/Reminder.php:60
+#, php-format
+msgid "Task with id %s not found"
+msgstr "Aufgabe mit der ID %s nicht gefunden"
+
+#: lib/Tasks/Handler/Modify.php:44
 #: lib/Tasks/Handler/Reminder.php:36
 msgid "Modify Task"
 msgstr "Aufgabe editieren"
 
-#: lib/Tasks/Handler/Modify.php:51
-#: lib/Tasks/Handler/Reminder.php:60
-#, php-format
-msgid "Task with tid %s not found"
-msgstr ""
-
-#: lib/Tasks/Handler/Modify.php:54
-msgid "Create task"
-msgstr "Aufgaben erstellen"
-
-#: lib/Tasks/Handler/Modify.php:57
+#: lib/Tasks/Handler/Modify.php:60
 msgid "%Y-%m-%d"
 msgstr "%d.%m.%Y"
 
-#: lib/Tasks/Handler/Modify.php:68
-#: templates/user/viewTasks.tpl:63
+#: lib/Tasks/Handler/Modify.php:71
+#: templates/user/viewTasks.tpl:84
 msgid "highest"
 msgstr "höchste"
 
-#: lib/Tasks/Handler/Modify.php:70
+#: lib/Tasks/Handler/Modify.php:73
 msgid "medium"
 msgstr "mittel"
 
-#: lib/Tasks/Handler/Modify.php:72
+#: lib/Tasks/Handler/Modify.php:75
 msgid "lowest"
 msgstr "tiefste"
-
-#: lib/Tasks/Handler/ModifyCategory.php:42
-#, php-format
-msgid "Category with id %s not found"
-msgstr ""
 
 #: lib/Tasks/Handler/Reminder.php:54
 msgid "Please don't forget the following task:"
 msgstr "Bitte vergiss folgende Aufgabe nicht:"
 
 #: lib/Tasks/Handler/Reminder.php:55
-#: templates/user/modify.tpl:24
-#: templates/user/view.tpl:24
-#: templates/user/viewTasks.tpl:62
+#: templates/user/modify.tpl:33
+#: templates/user/view.tpl:27
+#: templates/user/viewTasks.tpl:83
 msgid "Title"
 msgstr "Titel"
 
@@ -133,7 +123,7 @@ msgstr "Mehr Informationen hier"
 
 #: lib/Tasks/Handler/Reminder.php:63
 msgid "No tid given"
-msgstr ""
+msgstr "Keine ID ausgewählt"
 
 #: lib/Tasks/Handler/Reminder.php:94
 #, php-format
@@ -149,27 +139,32 @@ msgid "Reminder sended"
 msgstr "Erinnerung verschickt"
 
 #. ! module url (lower case without spaces and different to displayname)
-#: lib/Tasks/Installer.php:99
+#: lib/Tasks/Installer.php:91
 #: lib/Tasks/Version.php:18
 #: lib/Tasks/Version.php:21
 #: templates/search/options.tpl:4
 #: templates/user/modify.tpl:6
-#: templates/user/reminder.tpl:6
-#: templates/user/view.tpl:4
+#: templates/user/reminder.tpl:5
+#: templates/user/view.tpl:2
 #: templates/user/viewTasks.tpl:1
 msgid "Tasks"
 msgstr "Aufgaben"
 
-#: lib/Tasks/Installer.php:100
-msgid "to-do list for Zikula"
-msgstr "ToDo-Liste für Zikula"
+#: lib/Tasks/Installer.php:91
+msgid "Tasks categories"
+msgstr "Tasks Kategorien"
 
-#: lib/Tasks/Installer.php:111
-msgid "Main"
-msgstr "Main"
+#: lib/Tasks/Installer.php:98
+#: lib/Tasks/Installer.php:99
+msgid "Category 1"
+msgstr "Kategorie 1"
 
-#: lib/Tasks/Installer.php:116
-msgid "Tasks: 'Main' category created."
+#: lib/Tasks/Installer.php:99
+msgid "This is category 1"
+msgstr "Das ist Kategorie 1"
+
+#: lib/Tasks/Installer.php:102
+msgid "Tasks: 'Main' categories created."
 msgstr ""
 
 #: lib/Tasks/Version.php:19
@@ -178,11 +173,11 @@ msgstr "Ein einfacher Aufgabenverwalter"
 
 #: lib/Tasks/Version.php:32
 msgid "Tasks editor"
-msgstr ""
+msgstr "Tasks Editor"
 
 #: lib/Tasks/Version.php:36
 msgid "Tasks filters"
-msgstr ""
+msgstr "Tasks Filter"
 
 #: templates/plugins/function.formatParticipants.php:31
 msgid "You"
@@ -235,44 +230,6 @@ msgstr "Test"
 msgid "Import"
 msgstr "Import"
 
-#: templates/admin/modifyCategory.tpl:11
-msgid "Id"
-msgstr "ID"
-
-#: templates/admin/modifyCategory.tpl:12
-#: templates/admin/modifyCategory.tpl:44
-msgid "Name"
-msgstr "Name"
-
-#: templates/admin/modifyCategory.tpl:13
-msgid "Actions"
-msgstr "Aktions"
-
-#: templates/admin/modifyCategory.tpl:23
-#: templates/plugins/edit_icon.tpl:2
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: templates/admin/modifyCategory.tpl:39
-msgid "Edit category"
-msgstr "Kategorie bearbeiten"
-
-#: templates/admin/modifyCategory.tpl:41
-msgid "Add category"
-msgstr "Kategorie hinzufügen"
-
-#: templates/admin/modifyCategory.tpl:49
-#: templates/user/modify.tpl:91
-msgid "Save"
-msgstr "Speichern"
-
-#: templates/admin/modifyCategory.tpl:50
-#: templates/user/modify.tpl:92
-#: templates/user/reminder.tpl:43
-#: templates/user/viewTasks.tpl:50
-msgid "Cancel"
-msgstr "Verwerfen"
-
 #: templates/plugins/add.tpl:3
 #: templates/plugins/add.tpl:4
 msgid "Add task"
@@ -284,89 +241,131 @@ msgstr "Aufgabe hinzufügen"
 msgid "Edit task"
 msgstr "Aufgabe bearbeiten"
 
+#: templates/plugins/edit_icon.tpl:2
+msgid "Edit"
+msgstr "Bearbeiten"
+
 #: templates/plugins/remove_button.tpl:4
 msgid "Remove task"
 msgstr "Aufgabe löschen"
 
-#: templates/user/modify.tpl:28
-#: templates/user/view.tpl:58
-#: templates/user/viewTasks.tpl:63
+#: templates/user/modify.tpl:8
+msgid "Modify"
+msgstr "Editieren"
+
+#: templates/user/modify.tpl:10
+msgid "New"
+msgstr "Neu"
+
+#: templates/user/modify.tpl:37
+#: templates/user/view.tpl:61
+#: templates/user/viewTasks.tpl:84
 msgid "Priority"
 msgstr "Priorität"
 
-#: templates/user/modify.tpl:32
-#: templates/user/view.tpl:62
-#: templates/user/viewTasks.tpl:64
+#: templates/user/modify.tpl:42
+#: templates/user/view.tpl:65
+#: templates/user/viewTasks.tpl:85
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: templates/user/modify.tpl:41
-msgid "Notice: To send a private message to multiple groups, enter the group names separated by commas."
-msgstr ""
-
-#: templates/user/modify.tpl:50
-msgid "Available categories"
-msgstr "Verfügbare Kategorien"
-
 #: templates/user/modify.tpl:57
-#: templates/user/reminder.tpl:21
-#: templates/user/view.tpl:74
-#: templates/user/viewTasks.tpl:66
+#: templates/user/reminder.tpl:26
+#: templates/user/view.tpl:81
+#: templates/user/viewTasks.tpl:87
 msgid "Participants"
 msgstr "Mitwirkende"
 
-#: templates/user/modify.tpl:60
-#: templates/user/reminder.tpl:24
+#: templates/user/modify.tpl:61
+#: templates/user/reminder.tpl:29
 msgid "Notice: Please choose a user"
-msgstr ""
+msgstr "Bemerkung: Bitte einen Benutzer auswählen"
 
 #: templates/user/modify.tpl:75
-#: templates/user/view.tpl:30
-#: templates/user/viewTasks.tpl:65
+#: templates/user/view.tpl:33
+#: templates/user/viewTasks.tpl:86
 msgid "Deadline"
 msgstr "Deadline"
 
-#: templates/user/reminder.tpl:8
-#: templates/user/view.tpl:15
-#: templates/user/view.tpl:16
+#: templates/user/modify.tpl:90
+msgid "Save"
+msgstr "Speichern"
+
+#: templates/user/modify.tpl:91
+#: templates/user/reminder.tpl:48
+#: templates/user/viewTasks.tpl:71
+msgid "Cancel"
+msgstr "Verwerfen"
+
+#: templates/user/reminder.tpl:6
+#: templates/user/view.tpl:18
+#: templates/user/view.tpl:19
 msgid "Send reminder"
 msgstr "Erinnerung senden"
 
-#: templates/user/reminder.tpl:42
+#: templates/user/reminder.tpl:47
 msgid "Send"
 msgstr "Senden"
 
-#: templates/user/view.tpl:25
+#: templates/user/view.tpl:28
 msgid "Value"
 msgstr "Wert"
 
-#: templates/user/view.tpl:38
+#: templates/user/view.tpl:41
 msgid "Done date"
-msgstr ""
+msgstr "Beendigung"
 
-#: templates/user/view.tpl:46
+#: templates/user/view.tpl:49
 msgid "Creation date"
 msgstr "Erstellungsdatum"
 
-#: templates/user/view.tpl:54
+#: templates/user/view.tpl:57
 msgid "Creator"
 msgstr "Ersteller"
 
-#: templates/user/viewTasks.tpl:28
+#: templates/user/viewTasks.tpl:34
 msgid "Only my tasks"
 msgstr "Nur eigene Aufgaben"
 
-#: templates/user/viewTasks.tpl:49
+#: templates/user/viewTasks.tpl:50
+msgid "All categories"
+msgstr "Alle Kategorien"
+
+#: templates/user/viewTasks.tpl:70
 msgid "Filter"
 msgstr "Filter"
 
-#: templates/user/viewTasks.tpl:51
+#: templates/user/viewTasks.tpl:72
 msgid "Clear"
 msgstr "Verwerfen"
 
-#: templates/user/viewTasks.tpl:68
+#: templates/user/viewTasks.tpl:89
 msgid "Action"
 msgstr "Aktion"
+
+#~ msgid "All"
+#~ msgstr "Alle"
+
+#~ msgid "Create task"
+#~ msgstr "Aufgaben erstellen"
+
+#~ msgid "to-do list for Zikula"
+#~ msgstr "ToDo-Liste für Zikula"
+
+#~ msgid "Main"
+#~ msgstr "Main"
+
+#~ msgid "Id"
+#~ msgstr "ID"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#~ msgid "Actions"
+#~ msgstr "Aktions"
+
+#~ msgid "Add category"
+#~ msgstr "Kategorie hinzufügen"
 
 #~ msgid "Reminder"
 #~ msgstr "Erinnerung"

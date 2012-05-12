@@ -57,7 +57,7 @@ class Tasks_Handler_Reminder extends Zikula_Form_AbstractHandler
                            '</ul>'.$this->__('More information here').': '.'<a href="'.$url.'">'.$url.'</a>';
                 $view->assign('message', $message);
             } else {
-                return LogUtil::registerError($this->__f('Task with tid %s not found', $tid));
+                return LogUtil::registerError($this->__f('Task with id %s not found', $tid));
             }
         } else {
             return LogUtil::registerError($this->__('No tid given'));
