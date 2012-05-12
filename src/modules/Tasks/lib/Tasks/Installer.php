@@ -26,7 +26,6 @@ class Tasks_Installer extends Zikula_AbstractInstaller
             DoctrineHelper::createSchema($this->entityManager, array(
                 'Tasks_Entity_Tasks',
                 'Tasks_Entity_Participants',
-                //'Tasks_Entity_CategoryMembership',
                 'Tasks_Entity_Categories'
             ));
         } catch (Exception $e) {
@@ -70,12 +69,16 @@ class Tasks_Installer extends Zikula_AbstractInstaller
         DoctrineHelper::dropSchema($this->entityManager, array(
             'Tasks_Entity_Tasks',
             'Tasks_Entity_Participants',
-            //'Tasks_Entity_CategoryMembership',
             'Tasks_Entity_Categories'
         ));
         // Delete any module variables
         $this->delVars();
 
+        // delete categories
+        CategoryRegistryUtil::deleteEntry('Tasks');
+        CategoryUtil::deleteCategoriesByPath('/__SYSTEM__/Modules/Tasks', 'path');
+        
+        
         return true;
 
     }

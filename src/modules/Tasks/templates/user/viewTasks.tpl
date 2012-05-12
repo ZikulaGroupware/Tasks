@@ -28,26 +28,33 @@
         </select>
 
 
-        <select id="category" name="participant">
-        {foreach from=$users item="text" key='value'}
-            <option value="{$value}" {if $participant eq $value}selected="selected"{/if}>
-                {$text}
+        <select id="participant" name="participant">
+        
+            <option value="1" {if $participant eq 1}selected="selected"{/if}>
+                {gt text='Only my tasks'}
             </option>
-        {/foreach}
-        {foreach from=$otherUsers item="value"}
-            <option value="{$value.uname}" {if $participant eq $value.uname}selected="selected"{/if}>
-                {$value.uname}
+            <option value="2" {if $participant eq 2}selected="selected"{/if}>
+                {gt text='All tasks'}
             </option>
-        {/foreach}
+
+            {foreach from=$users item="value"}
+                <option value="{$value.uname}" {if $participant eq $value.uname}selected="selected"{/if}>
+                    {$value.uname}
+                </option>
+            {/foreach}
         </select>
 
 
         <select id="category" name="category">
-        {foreach from=$categories item="text" key='value'}
-            <option value="{$value}" {if $category eq $value}selected="selected"{/if}>
-                {$text}
+            <option value="all" {if $category eq 'all'}selected="selected"{/if}>
+                {gt text='All categories'}
             </option>
-        {/foreach}
+            
+            {foreach from=$categories item="text" key='catid'}
+                <option value="{$catid}" {if $category eq $catid}selected="selected"{/if}>
+                    {$text}
+                </option>
+            {/foreach}
         </select>
 
         <select id="limit" name="limit">
@@ -106,8 +113,8 @@
             {formatParticipants p=$task.participants}
         </td>
         <td>
-        {foreach from=$task.categories item='name'}
-            {$name|safetext}
+        {foreach from=$task.categories item='cat' name=cagroriesloop}
+            {$cat.category.displayName.$lang|safetext}{if !$smarty.foreach.cagroriesloop.last}, {/if}
         {/foreach}
         </td>
             <td class="z-nowrap">

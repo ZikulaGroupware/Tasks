@@ -47,12 +47,11 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
             
         } else {
             $task = new Tasks_Entity_Tasks();
-            $this->_progress = 0;
         }
         
 
         // assign current values to form fields
-        $view->assign('tasks', $task)
+        $view->assign('task', $task)
              ->assign($task->toArray());
         
         
@@ -122,74 +121,19 @@ class Tasks_Handler_Modify extends Zikula_Form_AbstractHandler
         // load form valuest
         $data = $view->getValues();
         
-        $task->merge($data);
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
         
-
-        return true;
-        
-        // switch between edit and create mode        
-       /* if ($this->_tid) {
-            $task = $this->entityManager->find('Tasks_Entity_Tasks', $this->_tid);
-            
-            // remove old participants
-            /*$old_participants = $this->entityManager->getRepository('Tasks_Entity_Participants')
-                                                    ->findBy(array('entity' => $this->_tid));
-            foreach($old_participants as $old_participant) {
-                $this->entityManager->remove($old_participant);
-                $this->entityManager->flush();
-            }
-            // remove old categories
-            $old_categories = $this->entityManager->getRepository('Tasks_Entity_CategoryMembership')
-                                                  ->findBy(array('entity' => $this->_tid));
-            foreach($old_categories as $old_category) {
-                $this->entityManager->remove($old_category);
-                $this->entityManager->flush();
-            }
-            $new_task = false;
-        } else {
-            $data['cr_uid'] = UserUtil::getVar('uid');
-            $data['cr_date'] = new DateTime;
-            $task = new Tasks_Entity_Tasks();
-            $new_task = true;
-        }
-        
-        if((int)$data['progress'] == 100 and $this->_progress != 100) {
+                
+        if((int)$data['progress'] == 100 and $task->getProgress != 100) {
             $data['done_date'] = new DateTime;;
-        }*/
-        
-
-        /*$participants = array();
-        if(!empty($data['participants'])) {
-            $participants = explode(',', $data['participants']);
-            foreach($participants as $participant) {
-                $task->setParticipants($participant);
-            }
         }
-        unset($data['participants']);
         
         
-        if(!empty($data['categories'])) {
-            foreach($data['categories'] as $id) {
-                $task->setCategories($id);
-            }
-        }
-        unset($data['categories']);*/
-        
-        
-        //$data['deadline'] = new DateTime($data['deadline']);
         
         $task->merge($data);
         $this->entityManager->persist($task);
-        $this->entityManager->flush();
+        $this->entityManager->flush(); 
         
-        if($new_task) {
-            ModUtil::apiFunc($this->name, 'Notification', 'newTask', array(
-                'users' => $participants,
-                'task'  => $task
-            ));
-        }
+        
         return $this->view->redirect($url);
     }
 

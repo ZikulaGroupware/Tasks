@@ -24,43 +24,6 @@ class Tasks_Api_User extends Zikula_AbstractApi
     public function getTask($tid)
     {
         return $this->entityManager->find('Tasks_Entity_Tasks', $tid);
-        
-        
-        
-        $em = $this->getService('doctrine.entitymanager');
-        $qb = $em->createQueryBuilder();
-        $qb->select('t, p')
-           ->from('Tasks_Entity_Tasks', 't')
-           ->where('t.tid = :tid')
-           ->setParameter('tid', $tid)
-           ->leftJoin('t.participants', 'p');
-           //->leftJoin('t.categories', 'c');
-         //  ->leftJoin('c.name', 'n');
-        $query = $qb->getQuery();
-        $result = $query->getArrayResult();
-        if(count($result) == 0) {
-            return false;
-        }
-        
-        $task = $result[0];
-        
-        
-        
-        /*$all_categories = $this->getCategories('list');
-        $categories = array();
-        foreach($task['categories'] as $value) {
-            $id  = $value['categoryId'];
-            $categories[$id] = $all_categories[$id];
-        }
-        $task['categories']  = $categories;*/
-        
-        $participants = array();
-        foreach($task['participants'] as $value) {
-            $participants[] = $value['uname'];
-        }
-        $task['participants'] = $participants;      
-        
-        return $task;
     }
 
     /**
@@ -70,106 +33,92 @@ class Tasks_Api_User extends Zikula_AbstractApi
     */
 
     public function getTasks($args)
-    { 
-        extract($args);
+    {
         
         
         $em = $this->getService('doctrine.entitymanager');
         $qb = $em->createQueryBuilder();
-        $qb->select('t, p, c')
+        $qb->select('t, c, p, d')
            ->from('Tasks_Entity_Tasks', 't')
            ->leftJoin('t.categories', 'c')
+           ->leftJoin('c.category', 'd')
            ->leftJoin('t.participants', 'p');
 
-       if(!empty($mode)) {
-            if( is_array($mode) ) {
-                $mode = $mode['0'];
+       if(!empty($args['mode'])) {
+            if( is_array($args['mode']) ) {
+                $args['mode'] = $args['mode']['0'];
             }
-            if($mode == "undone") {
+            if($args['mode'] == "undone") {
                 $qb->where('t.progress < 100');
-                if(empty($orderBy)) {
+                if(empty($args['orderBy'])) {
                     $qb->orderBy('t.deadline', 'ASC');
                 }
-            } else if($mode == "done") {
+            } else if($args['mode'] == "done") {
                 $qb->where('t.progress = 100');
             }
         }
         
         
-        if(!empty($orderBy)) {
+        if (!empty($args['orderBy'])) {
             list($order, $sort) = explode(' ', $orderBy);
             $qb->orderBy('t.'.$order, $sort);
         }
         
+
         
-        if(!empty($category) and $category[0] != 'all' and $category != 'all') {
-           $qb->leftJoin('t.categories', 'cc')
-              ->andWhere('cc.categoryId = :categoryId')
-              ->setParameter('categoryId', $category);
+        if(isset($args['category']) && $args['category'] != 'all') {
+           $qb->leftJoin('c.category', 'cc')
+              ->andWhere('cc.id = :categoryId')
+              ->setParameter('categoryId', $args['category']);
         }
             
 
-       if(!empty($search)) {
-            $search = '%'.$search.'%';
+        if (!empty($args['search'])) {
+            $args['search'] = '%'.$args['search'].'%';
             $qb->andWhere('t.title like :search or t.description like :search')
-               ->setParameter( 'search', $search);
+               ->setParameter( 'search', $args['search']);
         }
         
         
-        if(!empty($participant) and $participant != 2) {
-           if($participant == 1) {
-               $participant = UserUtil::getVar('uname');
+        if (isset($args['participant']) && $args['participant'] != 2) {
+           if($args['participant'] == 1) {
+               $args['participant'] = UserUtil::getVar('uname');
            }
+                      
            $qb->leftJoin('t.participants', 'q')
               ->andWhere('q.uname = :uname')
-              ->setParameter('uname', $participant);
+              ->setParameter('uname', $args['participant']);
         }
-        
         
                 
-        if(empty($paginator) and !empty($limit)) {
-            if( is_array($limit) ) {
-                $limit = $limit['0'];
+        if(empty($args['paginator']) and !empty($args['limit'])) {
+            if( is_array($args['limit']) ) {
+                $args['limit'] = $args['limit']['0'];
             }
-            $qb->setMaxResults($limit);
+            $qb->setMaxResults($args['limit']);
         }
         
-        $query = $qb->getQuery();  
+        $query = $qb->getQuery();
+                
         
-        
-        if( !empty($paginator) and !empty($limit)) {
-            if(empty($startnum) ) {
-                $startnum = 1;
+        if( !empty($args['paginator']) and !empty($args['limit'])) {
+            if(empty($args['startnum']) ) {
+                $args['startnum'] = 1;
             }
             $count = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);
-            $paginateQuery = \DoctrineExtensions\Paginate\Paginate::getPaginateQuery($query, $startnum -1 , $limit); // Step 2 and 3
+            $paginateQuery = \DoctrineExtensions\Paginate\Paginate::getPaginateQuery($query, $args['startnum']-1 , $args['limit']); // Step 2 and 3
             $result = $paginateQuery->getArrayResult();
         } else {
             $result = $query->getArrayResult();
         }
         
-                
-        // format categories
-        $all_categories = $this->getCategories('list');
-        foreach ($result as $key => $tasks) {
-            $list = array();
-            foreach($tasks['categories'] as $category) {
-                $id = $category['categoryId'];
-                if( array_key_exists($id, $all_categories) ) {
-                    $list[$id] = $all_categories[$id];
-                }
-            }
-            $result[$key]['categories'] = $list;
-        }
         
-        
-        if(!empty($paginator) ) {
+        if(!empty($args['paginator']) ) {
             if(empty($count)) {
                 $count = 0;
             }
             return array($result, $count);
         }
-        
         
         return $result;
     }
@@ -180,16 +129,12 @@ class Tasks_Api_User extends Zikula_AbstractApi
      * @param $outputStyle string output style (query|list|select|formdropdownlist)
      * @return array query array | formdropdownlist array
      */    
-    public function getCategories($outputStyle = 'query' )
+    public function getCategories()
     {
-        
         $mainCategory = CategoryRegistryUtil::getRegisteredModuleCategories('Tasks', 'Tasks');
         $output = array();
         foreach(CategoryUtil::getCategoriesByParentID($mainCategory['Main']) as $category) {
-            $output[] = array(
-                'text' => $category['name'],
-                'value' => $category['name'],
-            );
+            $output[$category['id']] = $category['display_name'][ZLanguage::getLocale()];
         }
         return $output;
         
@@ -249,19 +194,24 @@ class Tasks_Api_User extends Zikula_AbstractApi
      * @param args array page arguments
      */
     public function decodeurl($args)
-    {
+    {        
         // check we actually have some vars to work with...
         if (!isset($args['vars'])) {
             return LogUtil::registerArgsError();
-        }
+        }  
         
-                
+        
         if (!isset($args['vars'][2])) {
             return;            
         }
         
-        System::queryStringSetVar('tid', $args['vars'][2]);
+        if ($args['vars'][2] == $this->__('new')) {
+            System::queryStringSetVar('func', 'modify');
+            return;
+        }
         
+        
+        System::queryStringSetVar('tid', $args['vars'][2]);
         
         if (isset($args['vars'][3])) {
             System::queryStringSetVar('func', $args['vars'][3]);           
@@ -285,9 +235,10 @@ class Tasks_Api_User extends Zikula_AbstractApi
             return $shorturl;
         }
         
-        
         if (isset($vars['args']['tid'])) {
             $shorturl .= '/'.$vars['args']['tid'];            
+        } else if ($vars['func'] == 'modify') {
+            return $shorturl .= '/'.$this->__('new'); 
         }
         
         if ($vars['func'] != 'view') {

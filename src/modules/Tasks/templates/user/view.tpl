@@ -65,18 +65,22 @@
         <td>{gt text='Progress'}</td>
         <td>{$progress} %</td>
     </tr>
+    
+    
     <tr class="{cycle values='z-odd,z-even'}">
         <td>{gt text='Categories'}</td>
         <td>
-        {foreach from=$categories item='c'}
-            {$c.category.name|safetext}
+        {assign var="lang" value=$modvars.ZConfig.language_i18n}
+        {foreach from=$categories item='c' name=cagroriesloop}
+            {$c.category.displayName.$lang|safetext}{if !$smarty.foreach.cagroriesloop.last}, {/if}
         {/foreach}
         </td>
     </tr>
-    {*<tr class="{cycle values='z-odd,z-even'}">
+    
+    <tr class="{cycle values='z-odd,z-even'}">
         <td>{gt text='Participants'}</td>
-        <td>{$participants}</td>
-    </tr>*}
+        <td>{$task->getParticipants2()}</td>
+    </tr>
     </tbody>
 </table>
 

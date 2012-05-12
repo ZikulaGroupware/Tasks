@@ -45,8 +45,5 @@ class Tasks_Entity_Categories extends Zikula_Doctrine2_Entity_EntityCategory
     {
         $this->entity = $entity;
     }
-
-    
-    
     
 }

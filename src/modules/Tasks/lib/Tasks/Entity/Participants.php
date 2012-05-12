@@ -56,6 +56,12 @@ class Tasks_Entity_Participants extends Zikula_EntityAccess
     }
     
     
+    public function getUname()
+    {
+        return $this->uname;
+    }
+    
+    
     
     /**
      * The following are annotations which define the id field.

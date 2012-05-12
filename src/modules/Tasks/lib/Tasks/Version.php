@@ -19,7 +19,7 @@ class Tasks_Version extends Zikula_AbstractVersion
         $meta['description']    = $this->__('A simple to-do list manger');
         //! module url (lower case without spaces and different to displayname)
         $meta['url']            = $this->__('Tasks');
-        $meta['version']        = '2.0.0';
+        $meta['version']        = '1.0.0';
         $meta['author']         = 'Fabian Wuertz';
         $meta['contact']        = 'http://fabian.wuertz.org';
         $meta['securityschema'] = array('Tasks::'  => '::');
